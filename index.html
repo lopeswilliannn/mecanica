@@ -2,185 +2,281 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCheck - Gestão e Diagnóstico de Oficina</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AutoCheck App 🛠️</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client v2 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Phosphor Icons para estilo de App Mobile -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<body class="bg-slate-100 text-slate-800 p-4 md:p-8 min-h-screen">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none pb-20 md:pb-0">
 
-    <!-- TELA DE LOGIN -->
-    <div id="telaLogin" class="max-w-md mx-auto my-12 bg-white p-8 rounded-2xl shadow-xl border border-slate-200 space-y-6">
-        <div class="text-center">
-            <h1 class="text-3xl font-extrabold text-indigo-600">AutoCheck 🛠️</h1>
-            <p class="text-slate-500 text-sm mt-1">Acesso ao Sistema de Oficina</p>
-        </div>
-
-        <form id="formLogin" onsubmit="realizarLogin(event)" class="space-y-4">
-            <div>
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">E-mail</label>
-                <input type="email" id="loginEmail" required placeholder="mecanico@oficina.com" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Senha</label>
-                <input type="password" id="loginSenha" required placeholder="••••••••" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-            </div>
-
-            <div class="flex items-center justify-between text-sm">
-                <label class="inline-flex items-center cursor-pointer text-slate-600">
-                    <input type="checkbox" id="lembrarLogin" checked class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
-                    <span class="ml-2">Manter conectado / Lembrar</span>
-                </label>
-            </div>
-
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow transition">
-                Entrar no Sistema
-            </button>
-        </form>
-    </div>
-
-    <!-- TELA PRINCIPAL DA APLICAÇÃO -->
-    <div id="appPrincipal" class="max-w-4xl mx-auto space-y-6 hidden">
+    <!-- APLICAÇÃO -->
+    <div id="appContainer" class="flex-1 flex flex-col md:flex-row max-w-5xl mx-auto w-full bg-slate-800 min-h-screen shadow-2xl relative overflow-hidden">
         
-        <!-- Cabeçalho -->
-        <header class="bg-indigo-600 text-white p-6 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 class="text-2xl font-bold flex items-center gap-2">AutoCheck 🛠️</h1>
-                <p class="text-indigo-200 text-sm">Usuário Conectado: <span id="usuarioLogadoNome" class="font-semibold text-white"></span></p>
+        <!-- SIDEBAR / MENU SUPERIOR (Navegação Desktop & Mobile Header) -->
+        <aside id="sidebar" class="bg-slate-950 p-4 flex flex-row md:flex-col justify-between items-center md:items-start border-b md:border-b-0 md:border-r border-slate-700 w-full md:w-64 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-xl text-white">
+                    <i class="ph ph-wrench text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg text-white tracking-wide">AutoCheck</h1>
+                    <p class="text-xs text-slate-400">Gestão de Oficina</p>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="abrirModalGerenciador()" class="bg-indigo-800 hover:bg-indigo-900 text-white text-xs px-3 py-2 rounded-lg transition border border-indigo-500 shadow">
-                    ⚙️ Opções
+
+            <!-- Menu de Navegação (Desktop) -->
+            <nav class="hidden md:flex flex-col gap-2 w-full mt-8">
+                <button onclick="mudarAba('novaOS')" id="btnNav-novaOS" class="nav-item active flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                    <i class="ph ph-plus-circle text-lg"></i> Novo Diagnóstico
                 </button>
-                <button onclick="realizarLogout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-2 rounded-lg transition shadow">
-                    Sair 🚪
+                <button onclick="mudarAba('buscarPlaca')" id="btnNav-buscarPlaca" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                    <i class="ph ph-magnifying-glass text-lg"></i> Buscar Placa / Veículo
                 </button>
-            </div>
-        </header>
+                <button onclick="mudarAba('clientes')" id="btnNav-clientes" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                    <i class="ph ph-users text-lg"></i> Clientes
+                </button>
+                <button onclick="mudarAba('historico')" id="btnNav-historico" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                    <i class="ph ph-file-text text-lg"></i> Diagnósticos Salvos
+                </button>
+                <button onclick="mudarAba('config')" id="btnNav-config" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                    <i class="ph ph-gear text-lg"></i> Ajustes / Profissionais
+                </button>
+            </nav>
 
-        <!-- Seção: Seleção do Profissional Responsável -->
-        <section class="bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-                <h3 class="font-bold text-amber-900 text-sm">👨‍🔧 Profissional Responsável pelo Diagnóstico</h3>
-                <p class="text-xs text-amber-700">Selecione o mecânico da lista. Se deixar em branco, será atribuído ao usuário logado.</p>
-            </div>
-            <select id="selectProfissional" class="p-2 border border-amber-300 rounded-lg text-sm bg-white font-medium outline-none text-slate-700 w-full sm:w-64">
-                <option value="">Nenhum (Usar usuário logado)</option>
-            </select>
-        </section>
-
-        <!-- Seção 1: Cadastro de Cliente e Veículo -->
-        <section class="bg-white p-6 rounded-xl shadow-md border border-slate-200 space-y-4">
-            <h2 class="text-lg font-semibold text-slate-700 border-b pb-2">1. Dados do Cliente e Veículo</h2>
-            
-            <form id="formCadastro" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Nome Completo *</label>
-                    <input type="text" id="nome" required placeholder="Ex: João Silva" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">CPF (Opcional)</label>
-                    <input type="text" id="cpf" placeholder="000.000.000-00" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">WhatsApp / Telefone *</label>
-                    <input type="tel" id="telefone" required placeholder="5511999999999" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-
-                <div class="md:col-span-1">
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Modelo / Marca / Ano *</label>
-                    <input type="text" id="modelo" required placeholder="Ex: Fiat Uno 1.0 2018" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Placa do Veículo *</label>
-                    <input type="text" id="placa" required placeholder="ABC-1D23" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none uppercase">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Chassi (Opcional)</label>
-                    <input type="text" id="chassi" placeholder="Consulta de Peças" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none uppercase">
-                </div>
-            </form>
-        </section>
-
-        <!-- Seção 2: Checklist Dinâmico -->
-        <section class="bg-white p-6 rounded-xl shadow-md border border-slate-200 space-y-4">
-            <h2 class="text-lg font-semibold text-slate-700 border-b pb-2">2. Checklist de Diagnóstico</h2>
-            
-            <div id="containerChecklist" class="space-y-4 min-h-[100px]">
-                <p class="text-slate-400 text-sm">Carregando checklist...</p>
-            </div>
-
-            <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Observações do Mecânico</label>
-                <textarea id="observacoes" rows="2" placeholder="Ex: Barulho perceptível ao passar de 60km/h..." class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm"></textarea>
-            </div>
-
-            <div class="pt-4 flex justify-end">
-                <button onclick="salvarEEnviar()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg shadow transition flex items-center gap-2">
-                    <span>Finalizar & Enviar via WhatsApp</span>
+            <!-- Botão Sair -->
+            <div class="hidden md:block w-full border-t border-slate-800 pt-4">
+                <button onclick="realizarLogout()" class="w-full flex items-center gap-2 text-rose-400 hover:text-rose-300 p-2 text-xs font-semibold">
+                    <i class="ph ph-sign-out text-base"></i> Sair do Sistema
                 </button>
             </div>
-        </section>
+        </aside>
+
+        <!-- CONTEÚDO PRINCIPAL (Muda conforme a aba) -->
+        <main class="flex-1 p-4 md:p-6 overflow-y-auto">
+
+            <!-- TELA DE LOGIN (Se não estiver autenticado) -->
+            <div id="telaLogin" class="max-w-sm mx-auto my-12 bg-slate-900 p-6 rounded-2xl border border-slate-700 shadow-2xl space-y-4">
+                <div class="text-center">
+                    <i class="ph ph-wrench text-4xl text-indigo-500"></i>
+                    <h2 class="text-xl font-bold text-white mt-2">Acessar Oficina</h2>
+                </div>
+                <form onsubmit="realizarLogin(event)" class="space-y-3">
+                    <div>
+                        <label class="text-xs text-slate-400 font-semibold uppercase">E-mail</label>
+                        <input type="email" id="loginEmail" required class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 font-semibold uppercase">Senha</label>
+                        <input type="password" id="loginSenha" required class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-sm transition">Entrar</button>
+                </form>
+            </div>
+
+            <!-- CONTEÚDO AUTENTICADO -->
+            <div id="conteudoApp" class="hidden space-y-6">
+
+                <!-- ABA 1: NOVO DIAGNÓSTICO -->
+                <section id="aba-novaOS" class="aba-conteudo space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="ph ph-clipboard-text text-indigo-400"></i> Vistoria / Check-up
+                        </h2>
+                    </div>
+
+                    <!-- Seleção de Técnico -->
+                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-2">
+                        <span class="text-xs text-slate-400 font-medium">Técnico Responsável:</span>
+                        <select id="selectProfissional" class="bg-slate-800 text-white text-xs font-semibold p-2 rounded-lg border border-slate-600 outline-none w-full sm:w-auto">
+                            <option value="">Carregando...</option>
+                        </select>
+                    </div>
+
+                    <!-- Dados da Placa e Veículo -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">1. Veículo & KM</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="text-xs text-slate-400">Placa (Mercosul ou Antiga) *</label>
+                                <input type="text" id="osPlaca" oninput="mascaraEBuscarPlaca(this)" placeholder="ABC-1D23" maxlength="8" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white font-mono uppercase text-sm outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Modelo / Ano *</label>
+                                <input type="text" id="osModelo" placeholder="Ex: Gol 1.6 2020" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">KM Atual *</label>
+                                <input type="number" id="osKm" placeholder="Ex: 85000" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Controle de Troca de Óleo -->
+                        <div class="border-t border-slate-800 pt-3 mt-2">
+                            <label class="flex items-center gap-2 cursor-pointer mb-2">
+                                <input type="checkbox" id="chkTrocaOleo" onchange="toggleSecaoOleo()" class="rounded bg-slate-800 border-slate-600 text-indigo-600">
+                                <span class="text-xs font-bold text-amber-400">Registrar Troca de Óleo nesta visita</span>
+                            </label>
+
+                            <div id="secaoOleo" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-800/50 p-3 rounded-lg border border-amber-500/30">
+                                <div>
+                                    <label class="text-xs text-slate-400">Validade por KM</label>
+                                    <select id="oleoKmValidade" class="w-full p-2 bg-slate-800 border border-slate-600 rounded text-xs text-white">
+                                        <option value="5000">5.000 KM</option>
+                                        <option value="6000">6.000 KM</option>
+                                        <option value="7500">7.500 KM</option>
+                                        <option value="10000" selected>10.000 KM</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400">Validade por Tempo</label>
+                                    <select id="oleoMesesValidade" class="w-full p-2 bg-slate-800 border border-slate-600 rounded text-xs text-white">
+                                        <option value="6">6 Meses</option>
+                                        <option value="12" selected>12 Meses (1 Ano)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dados do Cliente -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">2. Cliente Relacionado</h3>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="text-xs text-slate-400">Nome do Cliente *</label>
+                                <input type="text" id="osClienteNome" placeholder="Ex: Maria Souza" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">WhatsApp / Tel *</label>
+                                <input type="tel" id="osClienteTel" placeholder="5511999999999" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Vínculo com o Veículo</label>
+                                <select id="osVinculo" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                                    <option value="Proprietário">Proprietário(a)</option>
+                                    <option value="Cônjuge">Cônjuge (Marido/Esposa)</option>
+                                    <option value="Filho(a)">Filho(a)</option>
+                                    <option value="Outro">Outro Responsável</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checklist -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">3. Checklist do Diagnóstico</h3>
+                        <div id="checklistContainer" class="space-y-3">Carregando itens...</div>
+                        
+                        <div>
+                            <label class="text-xs text-slate-400">Observações adicionais</label>
+                            <textarea id="osObs" rows="2" placeholder="Barulhos, detalhes de peças..." class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <button onclick="salvarOS()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl text-sm shadow-lg flex items-center justify-center gap-2">
+                        <i class="ph ph-whatsapp-logo text-xl"></i> Salvar e Salvar/Enviar no WhatsApp
+                    </button>
+                </section>
+
+                <!-- ABA 2: BUSCAR PLACA / CONSULTA DE VEÍCULO -->
+                <section id="aba-buscarPlaca" class="aba-conteudo hidden space-y-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
+                        <i class="ph ph-magnifying-glass text-indigo-400"></i> Consultar Veículo por Placa
+                    </h2>
+
+                    <div class="flex gap-2">
+                        <input type="text" id="buscaPlacaInput" oninput="mascaraPlacaInput(this)" placeholder="Digite a placa (ex: ABC1D23)" class="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono uppercase outline-none focus:border-indigo-500">
+                        <button onclick="executarBuscaPlaca()" class="bg-indigo-600 hover:bg-indigo-500 px-5 text-white rounded-xl font-bold text-sm">Buscar</button>
+                    </div>
+
+                    <div id="resultadoBuscaPlaca" class="space-y-4"></div>
+                </section>
+
+                <!-- ABA 3: CLIENTES -->
+                <section id="aba-clientes" class="aba-conteudo hidden space-y-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
+                        <i class="ph ph-users text-indigo-400"></i> Clientes Cadastrados
+                    </h2>
+                    <div id="listaClientes" class="space-y-3">Carregando clientes...</div>
+                </section>
+
+                <!-- ABA 4: HISTÓRICO DE DIAGNÓSTICOS -->
+                <section id="aba-historico" class="aba-conteudo hidden space-y-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
+                        <i class="ph ph-file-text text-indigo-400"></i> Diagnósticos Realizados
+                    </h2>
+                    <div id="listaHistoricoOS" class="space-y-3">Carregando diagnósticos...</div>
+                </section>
+
+                <!-- ABA 5: CONFIGURAÇÕES & AJUSTE DE PROFISSIONAIS -->
+                <section id="aba-config" class="aba-conteudo hidden space-y-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
+                        <i class="ph ph-gear text-indigo-400"></i> Gerenciar Equipe / Profissionais
+                    </h2>
+
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase">Novo Profissional</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="novoProfNome" placeholder="Nome do Mecânico" class="flex-1 p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            <button onclick="cadastrarProfissional()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 rounded-lg text-sm">Adicionar</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase">Equipe Atual (Edição/Exclusão)</h3>
+                        <div id="listaProfissionaisEdicao" class="space-y-2">Carregando equipe...</div>
+                    </div>
+                </section>
+
+            </div>
+
+        </main>
+
+        <!-- MENU DE NAVEGAÇÃO INFERIOR (Estilo App Mobile) -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 flex justify-around p-2 z-40">
+            <button onclick="mudarAba('novaOS')" id="btnNavMob-novaOS" class="nav-item-mob active flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
+                <i class="ph ph-plus-circle text-xl"></i> Vistoria
+            </button>
+            <button onclick="mudarAba('buscarPlaca')" id="btnNavMob-buscarPlaca" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
+                <i class="ph ph-magnifying-glass text-xl"></i> Placa
+            </button>
+            <button onclick="mudarAba('clientes')" id="btnNavMob-clientes" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
+                <i class="ph ph-users text-xl"></i> Clientes
+            </button>
+            <button onclick="mudarAba('historico')" id="btnNavMob-historico" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
+                <i class="ph ph-file-text text-xl"></i> Histórico
+            </button>
+            <button onclick="mudarAba('config')" id="btnNavMob-config" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
+                <i class="ph ph-gear text-xl"></i> Ajustes
+            </button>
+        </nav>
 
     </div>
 
-    <!-- Modal Gerenciador -->
-    <div id="modalGerenciador" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="text-lg font-bold text-slate-800">Cadastrar Opções / Profissionais</h3>
-                <button onclick="fecharModalGerenciador()" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
-            </div>
-
-            <!-- Cadastrar Profissional -->
-            <div class="space-y-2 border-b pb-4">
-                <h4 class="text-xs font-bold text-amber-600 uppercase">Cadastrar Novo Profissional (Mecânico)</h4>
-                <div class="flex gap-2">
-                    <input type="text" id="novoProfissionalNome" placeholder="Ex: Juliano Silva" class="flex-1 p-2 border rounded-lg text-sm outline-none">
-                    <button onclick="salvarProfissional()" class="bg-amber-600 hover:bg-amber-700 text-white text-sm px-4 py-2 rounded-lg font-medium">Salvar</button>
-                </div>
-            </div>
-
-            <!-- Cadastrar Categoria -->
-            <div class="space-y-2 border-b pb-4">
-                <h4 class="text-xs font-bold text-indigo-600 uppercase">Adicionar Nova Categoria</h4>
-                <div class="flex gap-2">
-                    <input type="text" id="novaCategoriaNome" placeholder="Ex: Transmissão" class="flex-1 p-2 border rounded-lg text-sm outline-none">
-                    <button onclick="salvarCategoria()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-lg font-medium">Salvar</button>
-                </div>
-            </div>
-
-            <!-- Cadastrar Item -->
-            <div class="space-y-2">
-                <h4 class="text-xs font-bold text-indigo-600 uppercase">Adicionar Novo Item de Checklist</h4>
-                <select id="selectCategoriaPai" class="w-full p-2 border rounded-lg text-sm outline-none bg-white">
-                    <option value="">Selecione a Categoria...</option>
-                </select>
-                <div class="flex gap-2">
-                    <input type="text" id="novoItemNome" placeholder="Ex: Embreagem patinando" class="flex-1 p-2 border rounded-lg text-sm outline-none">
-                    <button onclick="salvarItem()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-medium">Cadastrar Item</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- STYLES customizados para estado ativo -->
+    <style>
+        .nav-item.active { @apply bg-indigo-600 text-white font-bold; }
+        .nav-item-mob.active { @apply text-indigo-400 font-bold; }
+    </style>
 
     <script>
-        // CONFIGURAÇÃO DO SUPABASE COM SEUS DADOS
+        // CONFIGURAÇÕES DO SUPABASE
         const SUPABASE_URL = 'https://jaresywlrmrkcgkoezje.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_h8qNne7NeI5-798qJX-iqw_nD6X-Wnl';
         
-        // Ativa persistência local de sessão
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-            auth: {
-                persistSession: true,
-                storageKey: 'autocheck_session'
-            }
+            auth: { persistSession: true, storageKey: 'autocheck_session' }
         });
 
         let usuarioAtual = null;
 
+        // INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
@@ -191,19 +287,33 @@
             }
         });
 
-        // AUTENTICAÇÃO E SESSÃO
+        // NAVEGAÇÃO ENTRE ABAS
+        function mudarAba(abaId) {
+            document.querySelectorAll('.aba-conteudo').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item-mob').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(`aba-${abaId}`).classList.remove('hidden');
+            
+            const btnDesktop = document.getElementById(`btnNav-${abaId}`);
+            if(btnDesktop) btnDesktop.classList.add('active');
+            
+            const btnMob = document.getElementById(`btnNavMob-${abaId}`);
+            if(btnMob) btnMob.classList.add('active');
+
+            if(abaId === 'clientes') carregarListaClientes();
+            if(abaId === 'historico') carregarListaHistoricoOS();
+            if(abaId === 'config') carregarEquipeConfig();
+        }
+
+        // AUTH
         async function realizarLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginSenha').value;
-
-            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                alert('Erro ao realizar login: ' + error.message);
-                return;
-            }
-
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginSenha').value
+            });
+            if (error) return alert('Erro de Acesso: ' + error.message);
             usuarioAtual = data.user;
             exibirApp();
         }
@@ -215,171 +325,327 @@
 
         function exibirLogin() {
             document.getElementById('telaLogin').classList.remove('hidden');
-            document.getElementById('appPrincipal').classList.add('hidden');
+            document.getElementById('conteudoApp').classList.add('hidden');
         }
 
         function exibirApp() {
             document.getElementById('telaLogin').classList.add('hidden');
-            document.getElementById('appPrincipal').classList.remove('hidden');
-            document.getElementById('usuarioLogadoNome').innerText = usuarioAtual.email;
-
-            carregarProfissionais();
+            document.getElementById('conteudoApp').classList.remove('hidden');
+            carregarProfissionaisSelect();
             carregarChecklistDinamico();
         }
 
-        // CARREGAR LISTA DE PROFISSIONAIS
-        async function carregarProfissionais() {
-            const select = document.getElementById('selectProfissional');
-            const { data: profs, error } = await _supabase.from('profissionais').select('*').order('nome');
+        // MÁSCARA AUTOMÁTICA DE PLACA (Mercosul e Tradicional)
+        function mascaraPlacaFormatada(v) {
+            v = v.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (v.length > 7) v = v.substring(0, 7);
+            
+            // Formatando com hífen se for formato antigo (AAA1234 -> AAA-1234)
+            if (/^[A-Z]{3}[0-9]{4}$/.test(v)) {
+                return v.replace(/^([A-Z]{3})([0-9]{4})$/, '$1-$2');
+            }
+            // Formato Mercosul (AAA1A23 -> AAA-1A23 ou sem hífen visual)
+            if (v.length > 3) {
+                return v.substring(0, 3) + '-' + v.substring(3);
+            }
+            return v;
+        }
 
-            if (!error && profs) {
-                select.innerHTML = '<option value="">Nenhum (Usar usuário logado)</option>';
-                profs.forEach(p => {
-                    select.innerHTML += `<option value="${p.id}" data-nome="${p.nome}">${p.nome} (${p.cargo})</option>`;
-                });
+        function mascaraPlacaInput(el) {
+            el.value = mascaraPlacaFormatada(el.value);
+        }
+
+        async function mascaraEBuscarPlaca(el) {
+            el.value = mascaraPlacaFormatada(el.value);
+            const placaLimpa = el.value.replace('-', '');
+            
+            if (placaLimpa.length === 7) {
+                // Auto-busca dados do veículo se já existir
+                const { data: v } = await _supabase.from('veiculos').select('*, cliente_veiculo(cliente_id, tipo_vinculo, clientes(*))').eq('placa', placaLimpa).single();
+                if (v) {
+                    document.getElementById('osModelo').value = v.modelo || '';
+                    document.getElementById('osKm').value = v.km_atual || '';
+                    
+                    if (v.cliente_veiculo && v.cliente_veiculo.length > 0) {
+                        const prim = v.cliente_veiculo[0];
+                        document.getElementById('osClienteNome').value = prim.clientes.nome || '';
+                        document.getElementById('osClienteTel').value = prim.clientes.telefone || '';
+                        document.getElementById('osVinculo').value = prim.tipo_vinculo || 'Proprietário';
+                    }
+                }
             }
         }
 
-        // CARREGAR CHECKLIST DINÂMICO
+        function toggleSecaoOleo() {
+            const chk = document.getElementById('chkTrocaOleo').checked;
+            document.getElementById('secaoOleo').classList.toggle('hidden', !chk);
+        }
+
+        // CARREGAR DADOS DO SUPABASE
+        async function carregarProfissionaisSelect() {
+            const select = document.getElementById('selectProfissional');
+            const { data: profs } = await _supabase.from('profissionais').select('*').order('nome');
+            select.innerHTML = '';
+            if (profs) {
+                profs.forEach(p => select.innerHTML += `<option value="${p.id}">${p.nome} (${p.cargo})</option>`);
+            }
+        }
+
         async function carregarChecklistDinamico() {
-            const container = document.getElementById('containerChecklist');
-            const selectCatPai = document.getElementById('selectCategoriaPai');
+            const container = document.getElementById('checklistContainer');
+            const { data: categorias } = await _supabase.from('categorias_diagnostico').select(`id, nome, itens_diagnostico(id, nome)`).order('nome');
             
-            const { data: categorias } = await _supabase
-                .from('categorias_diagnostico')
-                .select(`id, nome, itens_diagnostico ( id, nome )`)
-                .order('nome');
-
             container.innerHTML = '';
-            selectCatPai.innerHTML = '<option value="">Selecione a Categoria...</option>';
-
             if (categorias) {
                 categorias.forEach(cat => {
-                    selectCatPai.innerHTML += `<option value="${cat.id}">${cat.nome}</option>`;
-
-                    let htmlCat = `
-                        <div class="border border-slate-100 rounded-lg p-3 bg-slate-50">
-                            <p class="font-bold text-indigo-700 text-sm mb-2">📌 ${cat.nome}</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                    `;
-
+                    let html = `<div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700">
+                        <p class="text-xs font-bold text-amber-400 mb-2">${cat.nome}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
+                    
                     if (cat.itens_diagnostico) {
                         cat.itens_diagnostico.forEach(item => {
-                            htmlCat += `
-                                <label class="flex items-center space-x-2 bg-white p-2.5 rounded border border-slate-200 cursor-pointer hover:border-indigo-300">
-                                    <input type="checkbox" value="${item.nome}" data-id="${item.id}" class="item-diag accent-indigo-600 w-4 h-4">
-                                    <span class="text-slate-700">${item.nome}</span>
-                                </label>
-                            `;
+                            html += `
+                                <label class="flex items-center gap-2 bg-slate-900/80 p-2 rounded border border-slate-700 text-xs text-slate-200 cursor-pointer">
+                                    <input type="checkbox" value="${item.nome}" data-id="${item.id}" class="item-chk rounded accent-indigo-500">
+                                    <span>${item.nome}</span>
+                                </label>`;
                         });
                     }
-                    htmlCat += `</div></div>`;
-                    container.innerHTML += htmlCat;
+                    html += `</div></div>`;
+                    container.innerHTML += html;
                 });
             }
         }
 
-        // FINALIZAR OS E DISPARAR WHATSAPP
-        async function salvarEEnviar() {
-            const nome = document.getElementById('nome').value.trim();
-            const cpf = document.getElementById('cpf').value.trim();
-            const telefone = document.getElementById('telefone').value.trim();
-            const modelo = document.getElementById('modelo').value.trim();
-            const placa = document.getElementById('placa').value.trim();
-            const chassi = document.getElementById('chassi').value.trim();
-            const observacoes = document.getElementById('observacoes').value.trim();
+        // SALVAR DIAGNÓSTICO E ENVIAR WHATSAPP
+        async function salvarOS() {
+            const placa = document.getElementById('osPlaca').value.replace('-', '').trim();
+            const modelo = document.getElementById('osModelo').value.trim();
+            const km = parseInt(document.getElementById('osKm').value) || 0;
+            const nomeCliente = document.getElementById('osClienteNome').value.trim();
+            const telCliente = document.getElementById('osClienteTel').value.trim();
+            const vinculo = document.getElementById('osVinculo').value;
+            const profId = document.getElementById('selectProfissional').value;
+            const obs = document.getElementById('osObs').value;
 
-            if (!nome || !telefone || !modelo || !placa) {
-                alert('Preencha os campos obrigatórios (*)');
+            if (!placa || !modelo || !nomeCliente || !telCliente) {
+                return alert('Preencha os campos obrigatórios (*)');
+            }
+
+            // 1. Cadastra/Atualiza Veículo
+            let { data: veiculo } = await _supabase.from('veiculos').select('id').eq('placa', placa).maybeSingle();
+            
+            const trocaOleo = document.getElementById('chkTrocaOleo').checked;
+            let dadosOleo = {};
+
+            if (trocaOleo) {
+                const mesVal = parseInt(document.getElementById('oleoMesesValidade').value);
+                const kmVal = parseInt(document.getElementById('oleoKmValidade').value);
+                const hoje = new Date();
+                const proxData = new Date(hoje.setMonth(hoje.getMonth() + mesVal)).toISOString().split('T')[0];
+
+                dadosOleo = {
+                    oleo_data_troca: new Date().toISOString().split('T')[0],
+                    oleo_tipo_validade_meses: mesVal,
+                    oleo_tipo_validade_km: kmVal,
+                    oleo_proxima_troca_km: km + kmVal,
+                    oleo_proxima_troca_data: proxData
+                };
+            }
+
+            if (!veiculo) {
+                const { data: novoveic } = await _supabase.from('veiculos').insert([{ placa, modelo, km_atual: km, ...dadosOleo }]).select().single();
+                veiculo = novoveic;
+            } else {
+                await _supabase.from('veiculos').update({ modelo, km_atual: km, ...dadosOleo }).eq('id', veiculo.id);
+            }
+
+            // Grava Histórico de KM
+            await _supabase.from('historico_km').insert([{ veiculo_id: veiculo.id, km }]);
+
+            // 2. Cadastra/Atualiza Cliente
+            let { data: cliente } = await _supabase.from('clientes').select('id').eq('telefone', telCliente).maybeSingle();
+            if (!cliente) {
+                const { data: novocli } = await _supabase.from('clientes').insert([{ nome: nomeCliente, telefone: telCliente }]).select().single();
+                cliente = novocli;
+            }
+
+            // 3. Vincula Cliente <-> Veículo
+            await _supabase.from('cliente_veiculo').upsert([{ cliente_id: cliente.id, veiculo_id: veiculo.id, tipo_vinculo: vinculo }]);
+
+            // 4. Cria Ordem de Serviço / Diagnóstico
+            const { data: os } = await _supabase.from('ordens_servico').insert([{
+                veiculo_id: veiculo.id,
+                profissional_id: profId ? parseInt(profId) : null,
+                observacoes: obs
+            }]).select().single();
+
+            // 5. Salva os Itens Marcados
+            const marcadosNomes = [];
+            const marcadosIds = [];
+            document.querySelectorAll('.item-chk:checked').forEach(c => {
+                marcadosNomes.push(c.value);
+                marcadosIds.push(parseInt(c.getAttribute('data-id')));
+            });
+
+            if (marcadosIds.length > 0) {
+                const pivo = marcadosIds.map(id => ({ os_id: os.id, item_id: id }));
+                await _supabase.from('os_itens_marcados').insert(pivo);
+            }
+
+            // Mensagem WhatsApp
+            let msg = `*Oficina AutoCheck* 🛠️\n\n`;
+            msg += `Olá, *${nomeCliente}*! Vistoria concluída para o veículo *${modelo}* (Placa: ${document.getElementById('osPlaca').value}).\n\n`;
+            msg += `📍 *KM Registrado:* ${km.toLocaleString('pt-BR')} KM\n`;
+
+            if (trocaOleo) {
+                msg += `🛢️ *Troca de óleo efetuada!* Próxima troca: ${dadosOleo.oleo_proxima_troca_km.toLocaleString('pt-BR')} KM ou ${dadosOleo.oleo_proxima_troca_data}\n`;
+            }
+
+            if (marcadosNomes.length > 0) {
+                msg += `\n📋 *Atenção para os seguintes itens:* \n`;
+                marcadosNomes.forEach(i => msg += `• ${i}\n`);
+            } else {
+                msg += `\n✅ *Nenhuma irregularidade encontrada na vistoria!*\n`;
+            }
+
+            if (obs) msg += `\n📝 *Obs:* ${obs}\n`;
+
+            window.open(`https://api.whatsapp.com/send?phone=${telCliente.replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`, '_blank');
+            alert('Diagnóstico registrado com sucesso!');
+        }
+
+        // BUSCA POR PLACA
+        async function executarBuscaPlaca() {
+            const busca = document.getElementById('buscaPlacaInput').value.replace('-', '').trim();
+            const res = document.getElementById('resultadoBuscaPlaca');
+            if(!busca) return;
+
+            res.innerHTML = 'Buscando...';
+
+            const { data: v } = await _supabase
+                .from('veiculos')
+                .select(`
+                    *,
+                    cliente_veiculo(tipo_vinculo, clientes(*)),
+                    ordens_servico(id, created_at, observacoes, profissionais(nome))
+                `)
+                .eq('placa', busca)
+                .maybeSingle();
+
+            if (!v) {
+                res.innerHTML = `<div class="bg-slate-900 p-4 rounded-xl text-slate-400 text-center">Nenhum veículo encontrado com a placa digitada.</div>`;
                 return;
             }
 
-            const selectProf = document.getElementById('selectProfissional');
-            let profissional_id = null;
-            let responsavel_nome = usuarioAtual.email;
-
-            if (selectProf.value !== "") {
-                profissional_id = parseInt(selectProf.value);
-                responsavel_nome = selectProf.options[selectProf.selectedIndex].getAttribute('data-nome');
+            let clientesHtml = '';
+            if (v.cliente_veiculo) {
+                v.cliente_veiculo.forEach(cv => {
+                    clientesHtml += `<li class="text-xs text-slate-300">• <b>${cv.clientes.nome}</b> (${cv.tipo_vinculo}) - Tel: ${cv.clientes.telefone}</li>`;
+                });
             }
 
-            const marcadosNomes = [];
-            const marcadosIds = [];
-            document.querySelectorAll('.item-diag:checked').forEach(el => {
-                marcadosNomes.push(el.value);
-                marcadosIds.push(parseInt(el.getAttribute('data-id')));
-            });
+            res.innerHTML = `
+                <div class="bg-slate-900 p-4 rounded-xl border border-indigo-500/40 space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">${v.modelo}</h3>
+                            <p class="text-xs font-mono text-indigo-400">PLACA: ${mascaraPlacaFormatada(v.placa)}</p>
+                        </div>
+                        <span class="bg-indigo-900/60 text-indigo-200 text-xs px-2.5 py-1 rounded-full border border-indigo-700">${v.km_atual ? v.km_atual.toLocaleString('pt-BR') : 0} KM</span>
+                    </div>
 
-            try {
-                const { data: cliente } = await _supabase.from('clientes').insert([{ nome, cpf, telefone }]).select().single();
-                const { data: veiculo } = await _supabase.from('veiculos').insert([{ cliente_id: cliente.id, modelo, placa, chassi }]).select().single();
+                    ${v.oleo_proxima_troca_km ? `
+                        <div class="bg-amber-950/40 border border-amber-500/30 p-2.5 rounded-lg text-xs text-amber-300">
+                            <b>🛢️ Próxima Troca de Óleo:</b> ${v.oleo_proxima_troca_km.toLocaleString('pt-BR')} KM ou ${v.oleo_proxima_troca_data || 'N/D'}
+                        </div>
+                    ` : ''}
 
-                const { data: os } = await _supabase.from('ordens_servico').insert([{ 
-                    veiculo_id: veiculo.id, 
-                    usuario_login_id: usuarioAtual.id,
-                    profissional_id: profissional_id,
-                    responsavel_nome: responsavel_nome,
-                    observacoes 
-                }]).select().single();
+                    <div class="border-t border-slate-800 pt-2">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-1">Pessoas Vinculadas ao Veículo:</p>
+                        <ul class="space-y-1">${clientesHtml || '<p class="text-xs text-slate-500">Nenhum cliente cadastrado</p>'}</ul>
+                    </div>
+                </div>
+            `;
+        }
 
-                if (marcadosIds.length > 0) {
-                    const dadosPivo = marcadosIds.map(id => ({ os_id: os.id, item_id: id }));
-                    await _supabase.from('os_itens_marcados').insert(dadosPivo);
-                }
+        // CONFIGURAÇÃO / EDIÇÃO DE PROFISSIONAIS
+        async function carregarEquipeConfig() {
+            const cont = document.getElementById('listaProfissionaisEdicao');
+            const { data: profs } = await _supabase.from('profissionais').select('*').order('nome');
+            cont.innerHTML = '';
 
-                let msg = `*Olá, ${nome}!* 🚗\n\n`;
-                msg += `Realizamos a inspeção no seu veículo *${modelo}* (Placa: ${placa.toUpperCase()}).\n`;
-                msg += `👨‍🔧 *Técnico Responsável:* ${responsavel_nome}\n\n`;
-
-                if (marcadosNomes.length > 0) {
-                    msg += `📋 *Itens identificados na vistoria:*\n`;
-                    marcadosNomes.forEach(i => msg += `• ${i}\n`);
-                } else {
-                    msg += `✅ *Nenhum problema grave foi encontrado na vistoria!*\n`;
-                }
-
-                if (observacoes) msg += `\n📝 *Obs:* ${observacoes}\n`;
-                msg += `\nGostaria de receber o orçamento desses itens sem compromisso?`;
-
-                const telLimpo = telefone.replace(/\D/g, '');
-                window.open(`https://api.whatsapp.com/send?phone=${telLimpo}&text=${encodeURIComponent(msg)}`, '_blank');
-
-            } catch (err) {
-                console.error(err);
-                alert("Erro ao salvar ordem de serviço!");
+            if (profs) {
+                profs.forEach(p => {
+                    cont.innerHTML += `
+                        <div class="flex items-center gap-2 bg-slate-800 p-2 rounded-lg">
+                            <input type="text" id="prof-nome-${p.id}" value="${p.nome}" class="flex-1 bg-slate-900 p-2 rounded text-xs text-white border border-slate-700">
+                            <button onclick="atualizarProfissional(${p.id})" class="bg-emerald-600 text-white text-xs px-3 py-2 rounded">Salvar</button>
+                            <button onclick="excluirProfissional(${p.id})" class="bg-rose-600 text-white text-xs px-3 py-2 rounded">Excluir</button>
+                        </div>
+                    `;
+                });
             }
         }
 
-        // CADASTROS VIA MODAL
-        async function salvarProfissional() {
-            const nome = document.getElementById('novoProfissionalNome').value.trim();
-            if (!nome) return alert('Digite o nome do profissional!');
-
+        async function cadastrarProfissional() {
+            const nome = document.getElementById('novoProfNome').value.trim();
+            if(!nome) return;
             await _supabase.from('profissionais').insert([{ nome }]);
-            document.getElementById('novoProfissionalNome').value = '';
-            carregarProfissionais();
-            alert('Profissional cadastrado!');
+            document.getElementById('novoProfNome').value = '';
+            carregarEquipeConfig();
+            carregarProfissionaisSelect();
         }
 
-        async function salvarCategoria() {
-            const nome = document.getElementById('novaCategoriaNome').value.trim();
-            if (!nome) return;
-            await _supabase.from('categorias_diagnostico').insert([{ nome }]);
-            document.getElementById('novaCategoriaNome').value = '';
-            carregarChecklistDinamico();
+        async function atualizarProfissional(id) {
+            const novoNome = document.getElementById(`prof-nome-${id}`).value.trim();
+            if(!novoNome) return;
+            await _supabase.from('profissionais').update({ nome: novoNome }).eq('id', id);
+            alert('Nome atualizado!');
+            carregarProfissionaisSelect();
         }
 
-        async function salvarItem() {
-            const categoria_id = document.getElementById('selectCategoriaPai').value;
-            const nome = document.getElementById('novoItemNome').value.trim();
-            if (!categoria_id || !nome) return;
-            await _supabase.from('itens_diagnostico').insert([{ categoria_id: parseInt(categoria_id), nome }]);
-            document.getElementById('novoItemNome').value = '';
-            carregarChecklistDinamico();
+        async function excluirProfissional(id) {
+            if(!confirm('Deseja excluir este profissional?')) return;
+            await _supabase.from('profissionais').delete().eq('id', id);
+            carregarEquipeConfig();
+            carregarProfissionaisSelect();
         }
 
-        function abrirModalGerenciador() { document.getElementById('modalGerenciador').classList.remove('hidden'); document.getElementById('modalGerenciador').classList.add('flex'); }
-        function fecharModalGerenciador() { document.getElementById('modalGerenciador').classList.add('hidden'); document.getElementById('modalGerenciador').classList.remove('flex'); }
+        async function carregarListaClientes() {
+            const cont = document.getElementById('listaClientes');
+            const { data: clis } = await _supabase.from('clientes').select('*').order('nome');
+            cont.innerHTML = '';
+            if (clis) {
+                clis.forEach(c => {
+                    cont.innerHTML += `
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-white text-sm">${c.nome}</p>
+                                <p class="text-slate-400">Tel: ${c.telefone}</p>
+                            </div>
+                        </div>`;
+                });
+            }
+        }
+
+        async function carregarListaHistoricoOS() {
+            const cont = document.getElementById('listaHistoricoOS');
+            const { data: osList } = await _supabase.from('ordens_servico').select('*, veiculos(modelo, placa)').order('created_at', { ascending: false });
+            cont.innerHTML = '';
+            if (osList) {
+                osList.forEach(os => {
+                    cont.innerHTML += `
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs space-y-1">
+                            <div class="flex justify-between font-bold text-indigo-400">
+                                <span>${os.veiculos ? os.veiculos.modelo : 'Veículo'} (${os.veiculos ? mascaraPlacaFormatada(os.veiculos.placa) : ''})</span>
+                                <span class="text-slate-400">${new Date(os.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <p class="text-slate-300">Obs: ${os.observacoes || 'Sem observações'}</p>
+                        </div>`;
+                });
+            }
+        }
     </script>
 </body>
 </html>
