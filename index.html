@@ -11,7 +11,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 p-4 md:p-8 min-h-screen">
 
-    <!-- TELA DE LOGIN (Exibida quando não há sessão ativa) -->
+    <!-- TELA DE LOGIN -->
     <div id="telaLogin" class="max-w-md mx-auto my-12 bg-white p-8 rounded-2xl shadow-xl border border-slate-200 space-y-6">
         <div class="text-center">
             <h1 class="text-3xl font-extrabold text-indigo-600">AutoCheck 🛠️</h1>
@@ -30,7 +30,7 @@
 
             <div class="flex items-center justify-between text-sm">
                 <label class="inline-flex items-center cursor-pointer text-slate-600">
-                    <input type="checkbox" id="lembrarLogin" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                    <input type="checkbox" id="lembrarLogin" checked class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                     <span class="ml-2">Manter conectado / Lembrar</span>
                 </label>
             </div>
@@ -41,7 +41,7 @@
         </form>
     </div>
 
-    <!-- TELA PRINCIPAL DA APLICAÇÃO (Oculta por padrão até realizar o login) -->
+    <!-- TELA PRINCIPAL DA APLICAÇÃO -->
     <div id="appPrincipal" class="max-w-4xl mx-auto space-y-6 hidden">
         
         <!-- Cabeçalho -->
@@ -64,7 +64,7 @@
         <section class="bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
                 <h3 class="font-bold text-amber-900 text-sm">👨‍🔧 Profissional Responsável pelo Diagnóstico</h3>
-                <p class="text-xs text-amber-700">Selecione o mecânico da lista abaixo. Se deixar em branco, o responsável será o usuário logado.</p>
+                <p class="text-xs text-amber-700">Selecione o mecânico da lista. Se deixar em branco, será atribuído ao usuário logado.</p>
             </div>
             <select id="selectProfissional" class="p-2 border border-amber-300 rounded-lg text-sm bg-white font-medium outline-none text-slate-700 w-full sm:w-64">
                 <option value="">Nenhum (Usar usuário logado)</option>
@@ -167,11 +167,11 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO SUPABASE
-        const SUPABASE_URL = 'https://SEU_PROJETO.supabase.co';
-        const SUPABASE_KEY = 'SUA_CHAVE_ANONIMA_SUPABASE';
+        // CONFIGURAÇÃO DO SUPABASE COM SEUS DADOS
+        const SUPABASE_URL = 'https://jaresywlrmrkcgkoezje.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_h8qNne7NeI5-798qJX-iqw_nD6X-Wnl';
         
-        // Ativa persistência local de sessão se o usuário optar por "Lembrar"
+        // Ativa persistência local de sessão
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
             auth: {
                 persistSession: true,
@@ -182,7 +182,6 @@
         let usuarioAtual = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // Verificar se já existe uma sessão ativa salva
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 usuarioAtual = session.user;
@@ -224,7 +223,6 @@
             document.getElementById('appPrincipal').classList.remove('hidden');
             document.getElementById('usuarioLogadoNome').innerText = usuarioAtual.email;
 
-            // Carrega dados dinâmicos do banco
             carregarProfissionais();
             carregarChecklistDinamico();
         }
@@ -296,17 +294,15 @@
                 return;
             }
 
-            // Lógica do Profissional Responsável
             const selectProf = document.getElementById('selectProfissional');
             let profissional_id = null;
-            let responsavel_nome = usuarioAtual.email; // Padrão: Usuário logado
+            let responsavel_nome = usuarioAtual.email;
 
             if (selectProf.value !== "") {
                 profissional_id = parseInt(selectProf.value);
                 responsavel_nome = selectProf.options[selectProf.selectedIndex].getAttribute('data-nome');
             }
 
-            // Coletar itens marcados
             const marcadosNomes = [];
             const marcadosIds = [];
             document.querySelectorAll('.item-diag:checked').forEach(el => {
@@ -315,13 +311,9 @@
             });
 
             try {
-                // Insere Cliente
                 const { data: cliente } = await _supabase.from('clientes').insert([{ nome, cpf, telefone }]).select().single();
-                
-                // Insere Veículo
                 const { data: veiculo } = await _supabase.from('veiculos').insert([{ cliente_id: cliente.id, modelo, placa, chassi }]).select().single();
 
-                // Insere Ordem de Serviço com o Responsável
                 const { data: os } = await _supabase.from('ordens_servico').insert([{ 
                     veiculo_id: veiculo.id, 
                     usuario_login_id: usuarioAtual.id,
@@ -330,13 +322,11 @@
                     observacoes 
                 }]).select().single();
 
-                // Insere Pivô
                 if (marcadosIds.length > 0) {
                     const dadosPivo = marcadosIds.map(id => ({ os_id: os.id, item_id: id }));
                     await _supabase.from('os_itens_marcados').insert(dadosPivo);
                 }
 
-                // Monta mensagem WhatsApp
                 let msg = `*Olá, ${nome}!* 🚗\n\n`;
                 msg += `Realizamos a inspeção no seu veículo *${modelo}* (Placa: ${placa.toUpperCase()}).\n`;
                 msg += `👨‍🔧 *Técnico Responsável:* ${responsavel_nome}\n\n`;
