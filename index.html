@@ -31,6 +31,9 @@
                 <button onclick="mudarAba('novaOS')" id="btnNav-novaOS" class="nav-item active flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
                     <i class="ph ph-plus-circle text-lg"></i> Novo Diagnóstico
                 </button>
+                <button onclick="mudarAba('orcamento')" id="btnNav-orcamento" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                    <i class="ph ph-calculator text-lg"></i> Criar Orçamento
+                </button>
                 <button onclick="mudarAba('buscarPlaca')" id="btnNav-buscarPlaca" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
                     <i class="ph ph-magnifying-glass text-lg"></i> Buscar Placa
                 </button>
@@ -195,7 +198,67 @@
                     </button>
                 </section>
 
-                <!-- ABA 2: BUSCA POR PLACA -->
+                <!-- ABA 2: GERAR ORÇAMENTO -->
+                <section id="aba-orcamento" class="aba-conteudo hidden space-y-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
+                        <i class="ph ph-calculator text-indigo-400"></i> Criar Orçamento de Peças / Serviços
+                    </h2>
+
+                    <!-- Dados Básicos -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Identificação do Cliente / Veículo</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                            <div>
+                                <label class="text-xs text-slate-400">Placa (Busca Auto)</label>
+                                <input type="text" id="orcPlaca" oninput="mascaraEBuscarPlacaOrcamento(this)" placeholder="ABC-1D23" maxlength="8" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white font-mono uppercase text-sm outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Veículo / Modelo *</label>
+                                <input type="text" id="orcVeiculo" placeholder="Ex: Gol 1.6 2020" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Nome do Cliente *</label>
+                                <input type="text" id="orcClienteNome" placeholder="Ex: João Silva" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">WhatsApp / Tel *</label>
+                                <input type="tel" id="orcClienteTel" placeholder="5511999999999" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabela de Itens de Orçamento -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Itens do Orçamento (Peças e Mão de Obra)</h3>
+                            <button onclick="adicionarLinhaOrcamento()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                                <i class="ph ph-plus text-sm"></i> Adicionar Item
+                            </button>
+                        </div>
+
+                        <div id="containerItensOrcamento" class="space-y-2">
+                            <!-- Linhas inseridas dinamicamente via JS -->
+                        </div>
+
+                        <!-- TOTALIZADOR -->
+                        <div class="flex justify-between items-center pt-3 border-t border-slate-800">
+                            <span class="text-sm font-bold text-slate-300">VALOR TOTAL DO ORÇAMENTO:</span>
+                            <span id="valorTotalOrcamento" class="text-xl font-extrabold text-emerald-400 font-mono">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <!-- Observação opcional -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2">
+                        <label class="text-xs text-slate-400 font-semibold uppercase">Observações do Orçamento (Ex: Condições de pagamento, Garantia)</label>
+                        <textarea id="orcObs" rows="2" placeholder="Ex: Validade deste orçamento: 5 dias. Pagamento em até 3x sem juros." class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none"></textarea>
+                    </div>
+
+                    <button onclick="enviarOrcamentoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl text-sm shadow-lg flex items-center justify-center gap-2">
+                        <i class="ph ph-whatsapp-logo text-xl"></i> Gerar e Enviar Orçamento no WhatsApp
+                    </button>
+                </section>
+
+                <!-- ABA 3: BUSCA POR PLACA -->
                 <section id="aba-buscarPlaca" class="aba-conteudo hidden space-y-4">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
                         <i class="ph ph-magnifying-glass text-indigo-400"></i> Consultar Veículo por Placa
@@ -209,7 +272,7 @@
                     <div id="resultadoBuscaPlaca" class="space-y-4"></div>
                 </section>
 
-                <!-- ABA 3: CLIENTES E EDIÇÃO -->
+                <!-- ABA 4: CLIENTES E EDIÇÃO -->
                 <section id="aba-clientes" class="aba-conteudo hidden space-y-4">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
                         <i class="ph ph-users text-indigo-400"></i> Clientes Cadastrados
@@ -217,7 +280,7 @@
                     <div id="listaClientes" class="space-y-3">Carregando clientes...</div>
                 </section>
 
-                <!-- ABA 4: HISTÓRICO DE DIAGNÓSTICOS -->
+                <!-- ABA 5: HISTÓRICO DE DIAGNÓSTICOS -->
                 <section id="aba-historico" class="aba-conteudo hidden space-y-4">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
                         <i class="ph ph-file-text text-indigo-400"></i> Diagnósticos Salvos
@@ -225,7 +288,7 @@
                     <div id="listaHistoricoOS" class="space-y-3">Carregando histórico...</div>
                 </section>
 
-                <!-- ABA 5: AJUSTES E EQUIPE -->
+                <!-- ABA 6: AJUSTES E EQUIPE -->
                 <section id="aba-config" class="aba-conteudo hidden space-y-6">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
                         <i class="ph ph-gear text-indigo-400"></i> Ajustes / Equipas & Diagnósticos
@@ -282,6 +345,9 @@
         <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 flex justify-around p-2 z-40">
             <button onclick="mudarAba('novaOS')" id="btnNavMob-novaOS" class="nav-item-mob active flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
                 <i class="ph ph-plus-circle text-xl"></i> Vistoria
+            </button>
+            <button onclick="mudarAba('orcamento')" id="btnNavMob-orcamento" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
+                <i class="ph ph-calculator text-xl"></i> Orçamento
             </button>
             <button onclick="mudarAba('buscarPlaca')" id="btnNavMob-buscarPlaca" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
                 <i class="ph ph-magnifying-glass text-xl"></i> Placa
@@ -372,6 +438,9 @@
             if(btnMob) btnMob.classList.add('active');
 
             if(abaId === 'novaOS') carregarChecklistDinamico();
+            if(abaId === 'orcamento' && document.querySelectorAll('.linha-orcamento').length === 0) {
+                adicionarLinhaOrcamento();
+            }
             if(abaId === 'clientes') carregarListaClientes();
             if(abaId === 'historico') carregarListaHistoricoOS();
             if(abaId === 'config') {
@@ -446,6 +515,24 @@
             }
         }
 
+        async function mascaraEBuscarPlacaOrcamento(el) {
+            el.value = mascaraPlacaFormatada(el.value);
+            const placaLimpa = el.value.replace('-', '');
+            
+            if (placaLimpa.length === 7) {
+                const { data: v } = await _supabase.from('veiculos').select('*, cliente_veiculo(cliente_id, clientes(*))').eq('placa', placaLimpa).single();
+                if (v) {
+                    document.getElementById('orcVeiculo').value = `${v.marca || ''} ${v.modelo || ''}`.trim();
+                    
+                    if (v.cliente_veiculo && v.cliente_veiculo.length > 0) {
+                        const prim = v.cliente_veiculo[0];
+                        document.getElementById('orcClienteNome').value = prim.clientes.nome || '';
+                        document.getElementById('orcClienteTel').value = prim.clientes.telefone || '';
+                    }
+                }
+            }
+        }
+
         function toggleSecaoOleo() {
             const chk = document.getElementById('chkTrocaOleo').checked;
             document.getElementById('secaoOleo').classList.toggle('hidden', !chk);
@@ -488,6 +575,118 @@
             } else {
                 container.innerHTML = `<p class="text-xs text-slate-400">Nenhuma categoria de diagnóstico cadastrada.</p>`;
             }
+        }
+
+        // FUNÇÕES DO MÓDULO DE ORÇAMENTO
+        let idLinhaOrcamento = 0;
+
+        function adicionarLinhaOrcamento() {
+            idLinhaOrcamento++;
+            const container = document.getElementById('containerItensOrcamento');
+            const div = document.createElement('div');
+            div.className = 'linha-orcamento grid grid-cols-12 gap-2 bg-slate-800/60 p-2.5 rounded-lg border border-slate-700 items-center';
+            div.id = `linha-orc-${idLinhaOrcamento}`;
+
+            div.innerHTML = `
+                <div class="col-span-12 sm:col-span-6">
+                    <input type="text" placeholder="Descrição do item / serviço" class="orc-desc w-full p-2 bg-slate-900 border border-slate-700 rounded text-xs text-white outline-none">
+                </div>
+                <div class="col-span-4 sm:col-span-2">
+                    <input type="number" min="1" value="1" oninput="calcularTotalOrcamento()" placeholder="Qtd" class="orc-qtd w-full p-2 bg-slate-900 border border-slate-700 rounded text-xs text-white text-center outline-none">
+                </div>
+                <div class="col-span-6 sm:col-span-3">
+                    <input type="number" step="0.01" min="0" oninput="calcularTotalOrcamento()" placeholder="Valor Unit (R$)" class="orc-val w-full p-2 bg-slate-900 border border-slate-700 rounded text-xs text-white text-right outline-none">
+                </div>
+                <div class="col-span-2 sm:col-span-1 flex justify-end">
+                    <button onclick="removerLinhaOrcamento('linha-orc-${idLinhaOrcamento}')" class="text-rose-400 hover:text-rose-300 p-1 font-bold text-base">
+                        <i class="ph ph-trash"></i>
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(div);
+            calcularTotalOrcamento();
+        }
+
+        function removerLinhaOrcamento(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+            calcularTotalOrcamento();
+        }
+
+        function calcularTotalOrcamento() {
+            let total = 0;
+            const linhas = document.querySelectorAll('.linha-orcamento');
+            
+            linhas.forEach(l => {
+                const qtd = parseFloat(l.querySelector('.orc-qtd').value) || 0;
+                const val = parseFloat(l.querySelector('.orc-val').value) || 0;
+                total += (qtd * val);
+            });
+
+            document.getElementById('valorTotalOrcamento').innerText = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            return total;
+        }
+
+        function enviarOrcamentoWhatsApp() {
+            const cliente = document.getElementById('orcClienteNome').value.trim();
+            const veiculo = document.getElementById('orcVeiculo').value.trim();
+            const placa = document.getElementById('orcPlaca').value.trim();
+            const tel = document.getElementById('orcClienteTel').value.trim();
+            const obs = document.getElementById('orcObs').value.trim();
+
+            if (!cliente || !tel) {
+                return alert('Preencha ao menos o Nome e o WhatsApp do cliente.');
+            }
+
+            const linhas = document.querySelectorAll('.linha-orcamento');
+            if (linhas.length === 0) {
+                return alert('Adicione pelo menos um item ao orçamento.');
+            }
+
+            let itensTexto = '';
+            let totalGeral = 0;
+            let temItemValido = false;
+
+            linhas.forEach((l, index) => {
+                const desc = l.querySelector('.orc-desc').value.trim();
+                const qtd = parseFloat(l.querySelector('.orc-qtd').value) || 0;
+                const valUnit = parseFloat(l.querySelector('.orc-val').value) || 0;
+
+                if (desc && qtd > 0) {
+                    temItemValido = true;
+                    const subtotal = qtd * valUnit;
+                    totalGeral += subtotal;
+
+                    const fmtUnit = valUnit.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    const fmtSub = subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                    itensTexto += `${index + 1}. *${desc}*\n   ↳ Qtd: ${qtd} x ${fmtUnit} = *${fmtSub}*\n`;
+                }
+            });
+
+            if (!temItemValido) {
+                return alert('Preencha a descrição de pelo menos um item do orçamento.');
+            }
+
+            const fmtTotalGeral = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            let msg = `*Mecânica Salvati* 🛠️\n`;
+            msg += `📄 *ORÇAMENTO DE SERVIÇOS / PEÇAS*\n\n`;
+            msg += `Olá, *${cliente}*!\n`;
+            if (veiculo || placa) {
+                msg += `Veículo: *${veiculo}* ${placa ? '(' + placa + ')' : ''}\n`;
+            }
+            msg += `\n📋 *Detalhamento dos Itens:*\n${itensTexto}\n`;
+            msg += `💰 *VALOR TOTAL: ${fmtTotalGeral}*\n`;
+
+            if (obs) {
+                msg += `\n📝 *Observações:* ${obs}\n`;
+            }
+
+            msg += `\nFicamos no aguardo da sua aprovação! Se tiver dúvidas, estamos à disposição.`;
+
+            window.open(`https://api.whatsapp.com/send?phone=${tel.replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         // SALVAR OS COM DADOS DETALHADOS DE VEÍCULO E HISTÓRICO DE KM
