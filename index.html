@@ -3,38 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AutoCheck App 🛠️</title>
+    <title>Mecânica Salvati App 🛠️</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client v2 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Phosphor Icons para estilo de App Mobile -->
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none pb-20 md:pb-0">
 
-    <!-- APLICAÇÃO -->
     <div id="appContainer" class="flex-1 flex flex-col md:flex-row max-w-5xl mx-auto w-full bg-slate-800 min-h-screen shadow-2xl relative overflow-hidden">
         
-        <!-- SIDEBAR / MENU SUPERIOR (Navegação Desktop & Mobile Header) -->
+        <!-- SIDEBAR DE NAVEGAÇÃO -->
         <aside id="sidebar" class="bg-slate-950 p-4 flex flex-row md:flex-col justify-between items-center md:items-start border-b md:border-b-0 md:border-r border-slate-700 w-full md:w-64 shrink-0">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2 rounded-xl text-white">
                     <i class="ph ph-wrench text-2xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-lg text-white tracking-wide">AutoCheck</h1>
+                    <h1 class="font-extrabold text-lg text-white tracking-wide">Mecânica Salvati</h1>
                     <p class="text-xs text-slate-400">Gestão de Oficina</p>
                 </div>
             </div>
 
-            <!-- Menu de Navegação (Desktop) -->
             <nav class="hidden md:flex flex-col gap-2 w-full mt-8">
                 <button onclick="mudarAba('novaOS')" id="btnNav-novaOS" class="nav-item active flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
                     <i class="ph ph-plus-circle text-lg"></i> Novo Diagnóstico
                 </button>
                 <button onclick="mudarAba('buscarPlaca')" id="btnNav-buscarPlaca" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
-                    <i class="ph ph-magnifying-glass text-lg"></i> Buscar Placa / Veículo
+                    <i class="ph ph-magnifying-glass text-lg"></i> Buscar Placa
                 </button>
                 <button onclick="mudarAba('clientes')" id="btnNav-clientes" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
                     <i class="ph ph-users text-lg"></i> Clientes
@@ -43,11 +41,10 @@
                     <i class="ph ph-file-text text-lg"></i> Diagnósticos Salvos
                 </button>
                 <button onclick="mudarAba('config')" id="btnNav-config" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
-                    <i class="ph ph-gear text-lg"></i> Ajustes / Profissionais
+                    <i class="ph ph-gear text-lg"></i> Ajustes / Equipas
                 </button>
             </nav>
 
-            <!-- Botão Sair -->
             <div class="hidden md:block w-full border-t border-slate-800 pt-4">
                 <button onclick="realizarLogout()" class="w-full flex items-center gap-2 text-rose-400 hover:text-rose-300 p-2 text-xs font-semibold">
                     <i class="ph ph-sign-out text-base"></i> Sair do Sistema
@@ -55,10 +52,10 @@
             </div>
         </aside>
 
-        <!-- CONTEÚDO PRINCIPAL (Muda conforme a aba) -->
+        <!-- CONTEÚDO PRINCIPAL -->
         <main class="flex-1 p-4 md:p-6 overflow-y-auto">
 
-            <!-- TELA DE LOGIN (Se não estiver autenticado) -->
+            <!-- TELA DE LOGIN -->
             <div id="telaLogin" class="max-w-sm mx-auto my-12 bg-slate-900 p-6 rounded-2xl border border-slate-700 shadow-2xl space-y-4">
                 <div class="text-center">
                     <i class="ph ph-wrench text-4xl text-indigo-500"></i>
@@ -67,11 +64,11 @@
                 <form onsubmit="realizarLogin(event)" class="space-y-3">
                     <div>
                         <label class="text-xs text-slate-400 font-semibold uppercase">E-mail</label>
-                        <input type="email" id="loginEmail" required class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 outline-none">
+                        <input type="email" id="loginEmail" required class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm outline-none focus:border-indigo-500">
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 font-semibold uppercase">Senha</label>
-                        <input type="password" id="loginSenha" required class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 outline-none">
+                        <input type="password" id="loginSenha" required class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm outline-none focus:border-indigo-500">
                     </div>
                     <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-sm transition">Entrar</button>
                 </form>
@@ -88,7 +85,7 @@
                         </h2>
                     </div>
 
-                    <!-- Seleção de Técnico -->
+                    <!-- Selección do Profissional -->
                     <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-2">
                         <span class="text-xs text-slate-400 font-medium">Técnico Responsável:</span>
                         <select id="selectProfissional" class="bg-slate-800 text-white text-xs font-semibold p-2 rounded-lg border border-slate-600 outline-none w-full sm:w-auto">
@@ -96,17 +93,29 @@
                         </select>
                     </div>
 
-                    <!-- Dados da Placa e Veículo -->
+                    <!-- Dados Detalhados do Veículo -->
                     <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">1. Veículo & KM</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">1. Dados do Veículo</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             <div>
-                                <label class="text-xs text-slate-400">Placa (Mercosul ou Antiga) *</label>
+                                <label class="text-xs text-slate-400">Placa *</label>
                                 <input type="text" id="osPlaca" oninput="mascaraEBuscarPlaca(this)" placeholder="ABC-1D23" maxlength="8" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white font-mono uppercase text-sm outline-none focus:border-indigo-500">
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400">Modelo / Ano *</label>
-                                <input type="text" id="osModelo" placeholder="Ex: Gol 1.6 2020" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                                <label class="text-xs text-slate-400">Marca *</label>
+                                <input type="text" id="osMarca" placeholder="Ex: Volkswagen" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Modelo *</label>
+                                <input type="text" id="osModelo" placeholder="Ex: Gol 1.6" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Ano</label>
+                                <input type="text" id="osAno" placeholder="Ex: 2020" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Chassi (Opcional)</label>
+                                <input type="text" id="osChassi" placeholder="Consulta de peças" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white font-mono text-sm uppercase outline-none">
                             </div>
                             <div>
                                 <label class="text-xs text-slate-400">KM Atual *</label>
@@ -114,7 +123,7 @@
                             </div>
                         </div>
 
-                        <!-- Controle de Troca de Óleo -->
+                        <!-- Troca de Óleo -->
                         <div class="border-t border-slate-800 pt-3 mt-2">
                             <label class="flex items-center gap-2 cursor-pointer mb-2">
                                 <input type="checkbox" id="chkTrocaOleo" onchange="toggleSecaoOleo()" class="rounded bg-slate-800 border-slate-600 text-indigo-600">
@@ -144,23 +153,25 @@
 
                     <!-- Dados do Cliente -->
                     <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">2. Cliente Relacionado</h3>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">2. Cliente Relacionado</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                             <div>
-                                <label class="text-xs text-slate-400">Nome do Cliente *</label>
+                                <label class="text-xs text-slate-400">Nome Completo *</label>
                                 <input type="text" id="osClienteNome" placeholder="Ex: Maria Souza" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">CPF (Opcional)</label>
+                                <input type="text" id="osClienteCpf" placeholder="000.000.000-00" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
                             </div>
                             <div>
                                 <label class="text-xs text-slate-400">WhatsApp / Tel *</label>
                                 <input type="tel" id="osClienteTel" placeholder="5511999999999" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
                             </div>
                             <div>
-                                <label class="text-xs text-slate-400">Vínculo com o Veículo</label>
+                                <label class="text-xs text-slate-400">Vínculo</label>
                                 <select id="osVinculo" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
                                     <option value="Proprietário">Proprietário(a)</option>
-                                    <option value="Cônjuge">Cônjuge (Marido/Esposa)</option>
+                                    <option value="Cônjuge">Cônjuge</option>
                                     <option value="Filho(a)">Filho(a)</option>
                                     <option value="Outro">Outro Responsável</option>
                                 </select>
@@ -170,21 +181,21 @@
 
                     <!-- Checklist -->
                     <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">3. Checklist do Diagnóstico</h3>
+                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">3. Checklist de Defeitos</h3>
                         <div id="checklistContainer" class="space-y-3">Carregando itens...</div>
                         
                         <div>
                             <label class="text-xs text-slate-400">Observações adicionais</label>
-                            <textarea id="osObs" rows="2" placeholder="Barulhos, detalhes de peças..." class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none"></textarea>
+                            <textarea id="osObs" rows="2" placeholder="Barulhos específicos, prazos..." class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none"></textarea>
                         </div>
                     </div>
 
                     <button onclick="salvarOS()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl text-sm shadow-lg flex items-center justify-center gap-2">
-                        <i class="ph ph-whatsapp-logo text-xl"></i> Salvar e Salvar/Enviar no WhatsApp
+                        <i class="ph ph-whatsapp-logo text-xl"></i> Finalizar Vistoria e Enviar WhatsApp
                     </button>
                 </section>
 
-                <!-- ABA 2: BUSCAR PLACA / CONSULTA DE VEÍCULO -->
+                <!-- ABA 2: BUSCA POR PLACA -->
                 <section id="aba-buscarPlaca" class="aba-conteudo hidden space-y-4">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
                         <i class="ph ph-magnifying-glass text-indigo-400"></i> Consultar Veículo por Placa
@@ -198,7 +209,7 @@
                     <div id="resultadoBuscaPlaca" class="space-y-4"></div>
                 </section>
 
-                <!-- ABA 3: CLIENTES -->
+                <!-- ABA 3: CLIENTES E EDIÇÃO -->
                 <section id="aba-clientes" class="aba-conteudo hidden space-y-4">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
                         <i class="ph ph-users text-indigo-400"></i> Clientes Cadastrados
@@ -209,28 +220,57 @@
                 <!-- ABA 4: HISTÓRICO DE DIAGNÓSTICOS -->
                 <section id="aba-historico" class="aba-conteudo hidden space-y-4">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
-                        <i class="ph ph-file-text text-indigo-400"></i> Diagnósticos Realizados
+                        <i class="ph ph-file-text text-indigo-400"></i> Diagnósticos Salvos
                     </h2>
-                    <div id="listaHistoricoOS" class="space-y-3">Carregando diagnósticos...</div>
+                    <div id="listaHistoricoOS" class="space-y-3">Carregando histórico...</div>
                 </section>
 
-                <!-- ABA 5: CONFIGURAÇÕES & AJUSTE DE PROFISSIONAIS -->
-                <section id="aba-config" class="aba-conteudo hidden space-y-4">
+                <!-- ABA 5: AJUSTES E EQUIPE -->
+                <section id="aba-config" class="aba-conteudo hidden space-y-6">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
-                        <i class="ph ph-gear text-indigo-400"></i> Gerenciar Equipe / Profissionais
+                        <i class="ph ph-gear text-indigo-400"></i> Ajustes / Equipas & Diagnósticos
                     </h2>
 
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <h3 class="text-xs font-bold text-amber-400 uppercase">Novo Profissional</h3>
-                        <div class="flex gap-2">
-                            <input type="text" id="novoProfNome" placeholder="Nome do Mecânico" class="flex-1 p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
-                            <button onclick="cadastrarProfissional()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 rounded-lg text-sm">Adicionar</button>
+                    <!-- GERENCIAMENTO DE EQUIPE -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold text-indigo-400 flex items-center gap-2 border-b border-slate-800 pb-1">
+                            <i class="ph ph-user-gear text-base"></i> Gerenciar Equipe / Profissionais
+                        </h3>
+
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                            <h4 class="text-xs font-bold text-amber-400 uppercase">Novo Profissional</h4>
+                            <div class="flex gap-2">
+                                <input type="text" id="novoProfNome" placeholder="Nome do Mecânico" class="flex-1 p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                                <button onclick="cadastrarProfissional()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 rounded-lg text-sm">Adicionar</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase">Equipe Atual (Edição/Exclusão)</h4>
+                            <div id="listaProfissionaisEdicao" class="space-y-2">Carregando equipe...</div>
                         </div>
                     </div>
 
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase">Equipe Atual (Edição/Exclusão)</h3>
-                        <div id="listaProfissionaisEdicao" class="space-y-2">Carregando equipe...</div>
+                    <!-- GERENCIAMENTO DE DIAGNÓSTICOS -->
+                    <div class="space-y-4 pt-2">
+                        <h3 class="text-sm font-bold text-indigo-400 flex items-center gap-2 border-b border-slate-800 pb-1">
+                            <i class="ph ph-list-checks text-base"></i> Gerenciar Categorias e Itens de Diagnóstico
+                        </h3>
+
+                        <!-- Adicionar Nova Categoria -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                            <h4 class="text-xs font-bold text-amber-400 uppercase">Nova Categoria de Vistoria</h4>
+                            <div class="flex gap-2">
+                                <input type="text" id="novaCategoriaNome" placeholder="Ex: CÂMBIO E TRANSMISSÃO" class="flex-1 p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                                <button onclick="cadastrarCategoria()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 rounded-lg text-sm">Criar Categoria</button>
+                            </div>
+                        </div>
+
+                        <!-- Categorias e Seus Itens -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-4">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase">Categorias e Itens Cadastrados</h4>
+                            <div id="listaDiagnosticosConfig" class="space-y-4">Carregando opções...</div>
+                        </div>
                     </div>
                 </section>
 
@@ -238,7 +278,7 @@
 
         </main>
 
-        <!-- MENU DE NAVEGAÇÃO INFERIOR (Estilo App Mobile) -->
+        <!-- NAVEGAÇÃO MOBILE INFERIOR -->
         <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 flex justify-around p-2 z-40">
             <button onclick="mudarAba('novaOS')" id="btnNavMob-novaOS" class="nav-item-mob active flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
                 <i class="ph ph-plus-circle text-xl"></i> Vistoria
@@ -259,14 +299,46 @@
 
     </div>
 
-    <!-- STYLES customizados para estado ativo -->
+    <!-- MODAL DE EDIÇÃO DE CLIENTE -->
+    <div id="modalEditCliente" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 w-full max-w-md space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-white text-base">Editar Cadastro de Cliente</h3>
+                <button onclick="fecharModalCliente()" class="text-slate-400 hover:text-white font-bold">✕</button>
+            </div>
+            <input type="hidden" id="editClienteId">
+            <div>
+                <label class="text-xs text-slate-400">Nome Completo</label>
+                <input type="text" id="editClienteNome" class="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm outline-none">
+            </div>
+            <div>
+                <label class="text-xs text-slate-400">CPF</label>
+                <input type="text" id="editClienteCpf" class="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm outline-none">
+            </div>
+            <div>
+                <label class="text-xs text-slate-400">WhatsApp / Telefone</label>
+                <input type="tel" id="editClienteTel" class="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm outline-none">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="fecharModalCliente()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold">Cancelar</button>
+                <button onclick="salvarEdicaoCliente()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
     <style>
-        .nav-item.active { @apply bg-indigo-600 text-white font-bold; }
-        .nav-item-mob.active { @apply text-indigo-400 font-bold; }
+    .nav-item.active {
+        background-color: rgb(79 70 229); /* bg-indigo-600 */
+        color: rgb(255 255 255);          /* text-white */
+        font-weight: 700;                  /* font-bold */
+    }
+    .nav-item-mob.active {
+        color: rgb(129 140 248);          /* text-indigo-400 */
+        font-weight: 700;                  /* font-bold */
+    }
     </style>
 
     <script>
-        // CONFIGURAÇÕES DO SUPABASE
         const SUPABASE_URL = 'https://jaresywlrmrkcgkoezje.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_h8qNne7NeI5-798qJX-iqw_nD6X-Wnl';
         
@@ -276,7 +348,6 @@
 
         let usuarioAtual = null;
 
-        // INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
@@ -287,7 +358,6 @@
             }
         });
 
-        // NAVEGAÇÃO ENTRE ABAS
         function mudarAba(abaId) {
             document.querySelectorAll('.aba-conteudo').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -301,12 +371,15 @@
             const btnMob = document.getElementById(`btnNavMob-${abaId}`);
             if(btnMob) btnMob.classList.add('active');
 
+            if(abaId === 'novaOS') carregarChecklistDinamico();
             if(abaId === 'clientes') carregarListaClientes();
             if(abaId === 'historico') carregarListaHistoricoOS();
-            if(abaId === 'config') carregarEquipeConfig();
+            if(abaId === 'config') {
+                carregarEquipeConfig();
+                carregarDiagnosticosConfig();
+            }
         }
 
-        // AUTH
         async function realizarLogin(e) {
             e.preventDefault();
             const { data, error } = await _supabase.auth.signInWithPassword({
@@ -335,40 +408,37 @@
             carregarChecklistDinamico();
         }
 
-        // MÁSCARA AUTOMÁTICA DE PLACA (Mercosul e Tradicional)
         function mascaraPlacaFormatada(v) {
             v = v.toUpperCase().replace(/[^A-Z0-9]/g, '');
             if (v.length > 7) v = v.substring(0, 7);
-            
-            // Formatando com hífen se for formato antigo (AAA1234 -> AAA-1234)
             if (/^[A-Z]{3}[0-9]{4}$/.test(v)) {
                 return v.replace(/^([A-Z]{3})([0-9]{4})$/, '$1-$2');
             }
-            // Formato Mercosul (AAA1A23 -> AAA-1A23 ou sem hífen visual)
             if (v.length > 3) {
                 return v.substring(0, 3) + '-' + v.substring(3);
             }
             return v;
         }
 
-        function mascaraPlacaInput(el) {
-            el.value = mascaraPlacaFormatada(el.value);
-        }
+        function mascaraPlacaInput(el) { el.value = mascaraPlacaFormatada(el.value); }
 
         async function mascaraEBuscarPlaca(el) {
             el.value = mascaraPlacaFormatada(el.value);
             const placaLimpa = el.value.replace('-', '');
             
             if (placaLimpa.length === 7) {
-                // Auto-busca dados do veículo se já existir
                 const { data: v } = await _supabase.from('veiculos').select('*, cliente_veiculo(cliente_id, tipo_vinculo, clientes(*))').eq('placa', placaLimpa).single();
                 if (v) {
+                    document.getElementById('osMarca').value = v.marca || '';
                     document.getElementById('osModelo').value = v.modelo || '';
+                    document.getElementById('osAno').value = v.ano || '';
+                    document.getElementById('osChassi').value = v.chassi || '';
                     document.getElementById('osKm').value = v.km_atual || '';
                     
                     if (v.cliente_veiculo && v.cliente_veiculo.length > 0) {
                         const prim = v.cliente_veiculo[0];
                         document.getElementById('osClienteNome').value = prim.clientes.nome || '';
+                        document.getElementById('osClienteCpf').value = prim.clientes.cpf || '';
                         document.getElementById('osClienteTel').value = prim.clientes.telefone || '';
                         document.getElementById('osVinculo').value = prim.tipo_vinculo || 'Proprietário';
                     }
@@ -381,7 +451,6 @@
             document.getElementById('secaoOleo').classList.toggle('hidden', !chk);
         }
 
-        // CARREGAR DADOS DO SUPABASE
         async function carregarProfissionaisSelect() {
             const select = document.getElementById('selectProfissional');
             const { data: profs } = await _supabase.from('profissionais').select('*').order('nome');
@@ -393,38 +462,48 @@
 
         async function carregarChecklistDinamico() {
             const container = document.getElementById('checklistContainer');
-            const { data: categorias } = await _supabase.from('categorias_diagnostico').select(`id, nome, itens_diagnostico(id, nome)`).order('nome');
+            const { data: categorias } = await _supabase.from('categorias_diagnostico').select(`id, nome, itens_diagnostico(id, nome)`).order('id');
             
             container.innerHTML = '';
-            if (categorias) {
+            if (categorias && categorias.length > 0) {
                 categorias.forEach(cat => {
                     let html = `<div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700">
                         <p class="text-xs font-bold text-amber-400 mb-2">${cat.nome}</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
                     
-                    if (cat.itens_diagnostico) {
+                    if (cat.itens_diagnostico && cat.itens_diagnostico.length > 0) {
                         cat.itens_diagnostico.forEach(item => {
                             html += `
-                                <label class="flex items-center gap-2 bg-slate-900/80 p-2 rounded border border-slate-700 text-xs text-slate-200 cursor-pointer">
+                                <label class="flex items-center gap-2 bg-slate-900/80 p-2 rounded border border-slate-700 text-xs text-slate-200 cursor-pointer hover:border-slate-500">
                                     <input type="checkbox" value="${item.nome}" data-id="${item.id}" class="item-chk rounded accent-indigo-500">
                                     <span>${item.nome}</span>
                                 </label>`;
                         });
+                    } else {
+                        html += `<span class="text-xs text-slate-500 italic">Nenhum item cadastrado nesta categoria.</span>`;
                     }
                     html += `</div></div>`;
                     container.innerHTML += html;
                 });
+            } else {
+                container.innerHTML = `<p class="text-xs text-slate-400">Nenhuma categoria de diagnóstico cadastrada.</p>`;
             }
         }
 
-        // SALVAR DIAGNÓSTICO E ENVIAR WHATSAPP
+        // SALVAR OS COM DADOS DETALHADOS DE VEÍCULO E HISTÓRICO DE KM
         async function salvarOS() {
             const placa = document.getElementById('osPlaca').value.replace('-', '').trim();
+            const marca = document.getElementById('osMarca').value.trim();
             const modelo = document.getElementById('osModelo').value.trim();
+            const ano = document.getElementById('osAno').value.trim();
+            const chassi = document.getElementById('osChassi').value.trim();
             const km = parseInt(document.getElementById('osKm').value) || 0;
+            
             const nomeCliente = document.getElementById('osClienteNome').value.trim();
+            const cpfCliente = document.getElementById('osClienteCpf').value.trim();
             const telCliente = document.getElementById('osClienteTel').value.trim();
             const vinculo = document.getElementById('osVinculo').value;
+            
             const profId = document.getElementById('selectProfissional').value;
             const obs = document.getElementById('osObs').value;
 
@@ -432,7 +511,7 @@
                 return alert('Preencha os campos obrigatórios (*)');
             }
 
-            // 1. Cadastra/Atualiza Veículo
+            // 1. Veículo
             let { data: veiculo } = await _supabase.from('veiculos').select('id').eq('placa', placa).maybeSingle();
             
             const trocaOleo = document.getElementById('chkTrocaOleo').checked;
@@ -453,34 +532,38 @@
                 };
             }
 
+            const payloadVeiculo = { placa, marca, modelo, ano, chassi, km_atual: km, ...dadosOleo };
+
             if (!veiculo) {
-                const { data: novoveic } = await _supabase.from('veiculos').insert([{ placa, modelo, km_atual: km, ...dadosOleo }]).select().single();
+                const { data: novoveic } = await _supabase.from('veiculos').insert([payloadVeiculo]).select().single();
                 veiculo = novoveic;
             } else {
-                await _supabase.from('veiculos').update({ modelo, km_atual: km, ...dadosOleo }).eq('id', veiculo.id);
+                await _supabase.from('veiculos').update(payloadVeiculo).eq('id', veiculo.id);
             }
 
-            // Grava Histórico de KM
+            // Gravar histórico de KM a cada vistoria
             await _supabase.from('historico_km').insert([{ veiculo_id: veiculo.id, km }]);
 
-            // 2. Cadastra/Atualiza Cliente
+            // 2. Cliente
             let { data: cliente } = await _supabase.from('clientes').select('id').eq('telefone', telCliente).maybeSingle();
             if (!cliente) {
-                const { data: novocli } = await _supabase.from('clientes').insert([{ nome: nomeCliente, telefone: telCliente }]).select().single();
+                const { data: novocli } = await _supabase.from('clientes').insert([{ nome: nomeCliente, cpf: cpfCliente, telefone: telCliente }]).select().single();
                 cliente = novocli;
+            } else {
+                await _supabase.from('clientes').update({ nome: nomeCliente, cpf: cpfCliente }).eq('id', cliente.id);
             }
 
-            // 3. Vincula Cliente <-> Veículo
+            // 3. Vínculo
             await _supabase.from('cliente_veiculo').upsert([{ cliente_id: cliente.id, veiculo_id: veiculo.id, tipo_vinculo: vinculo }]);
 
-            // 4. Cria Ordem de Serviço / Diagnóstico
+            // 4. Diagnóstico / OS
             const { data: os } = await _supabase.from('ordens_servico').insert([{
                 veiculo_id: veiculo.id,
                 profissional_id: profId ? parseInt(profId) : null,
                 observacoes: obs
             }]).select().single();
 
-            // 5. Salva os Itens Marcados
+            // 5. Itens marcados
             const marcadosNomes = [];
             const marcadosIds = [];
             document.querySelectorAll('.item-chk:checked').forEach(c => {
@@ -493,9 +576,9 @@
                 await _supabase.from('os_itens_marcados').insert(pivo);
             }
 
-            // Mensagem WhatsApp
-            let msg = `*Oficina AutoCheck* 🛠️\n\n`;
-            msg += `Olá, *${nomeCliente}*! Vistoria concluída para o veículo *${modelo}* (Placa: ${document.getElementById('osPlaca').value}).\n\n`;
+            // WhatsApp
+            let msg = `*Mecânica Salvati* 🛠️\n\n`;
+            msg += `Olá, *${nomeCliente}*! Vistoria concluída para o *${marca} ${modelo}* (Placa: ${document.getElementById('osPlaca').value}).\n\n`;
             msg += `📍 *KM Registrado:* ${km.toLocaleString('pt-BR')} KM\n`;
 
             if (trocaOleo) {
@@ -515,7 +598,7 @@
             alert('Diagnóstico registrado com sucesso!');
         }
 
-        // BUSCA POR PLACA
+        // BUSCA POR PLACA COM HISTÓRICO DE KM E REVISÕES
         async function executarBuscaPlaca() {
             const busca = document.getElementById('buscaPlacaInput').value.replace('-', '').trim();
             const res = document.getElementById('resultadoBuscaPlaca');
@@ -528,7 +611,7 @@
                 .select(`
                     *,
                     cliente_veiculo(tipo_vinculo, clientes(*)),
-                    ordens_servico(id, created_at, observacoes, profissionais(nome))
+                    historico_km(km, created_at)
                 `)
                 .eq('placa', busca)
                 .maybeSingle();
@@ -541,7 +624,14 @@
             let clientesHtml = '';
             if (v.cliente_veiculo) {
                 v.cliente_veiculo.forEach(cv => {
-                    clientesHtml += `<li class="text-xs text-slate-300">• <b>${cv.clientes.nome}</b> (${cv.tipo_vinculo}) - Tel: ${cv.clientes.telefone}</li>`;
+                    clientesHtml += `<li class="text-xs text-slate-300">• <b>${cv.clientes.nome}</b> (${cv.tipo_vinculo}) - Tel: ${cv.clientes.telefone} ${cv.clientes.cpf ? '| CPF: ' + cv.clientes.cpf : ''}</li>`;
+                });
+            }
+
+            let kmHistHtml = '';
+            if (v.historico_km && v.historico_km.length > 0) {
+                v.historico_km.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5).forEach(h => {
+                    kmHistHtml += `<span class="bg-slate-800 border border-slate-700 text-[10px] px-2 py-1 rounded text-slate-300">${new Date(h.created_at).toLocaleDateString()}: ${h.km.toLocaleString('pt-BR')} KM</span> `;
                 });
             }
 
@@ -549,8 +639,8 @@
                 <div class="bg-slate-900 p-4 rounded-xl border border-indigo-500/40 space-y-3">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h3 class="text-lg font-bold text-white">${v.modelo}</h3>
-                            <p class="text-xs font-mono text-indigo-400">PLACA: ${mascaraPlacaFormatada(v.placa)}</p>
+                            <h3 class="text-lg font-bold text-white">${v.marca || ''} ${v.modelo} ${v.ano ? '('+v.ano+')' : ''}</h3>
+                            <p class="text-xs font-mono text-indigo-400">PLACA: ${mascaraPlacaFormatada(v.placa)} ${v.chassi ? '| CHASSI: ' + v.chassi : ''}</p>
                         </div>
                         <span class="bg-indigo-900/60 text-indigo-200 text-xs px-2.5 py-1 rounded-full border border-indigo-700">${v.km_atual ? v.km_atual.toLocaleString('pt-BR') : 0} KM</span>
                     </div>
@@ -561,15 +651,126 @@
                         </div>
                     ` : ''}
 
+                    <div class="border-t border-slate-800 pt-2 space-y-1">
+                        <p class="text-xs font-bold text-slate-400 uppercase">Histórico Recente de KM:</p>
+                        <div class="flex flex-wrap gap-1">${kmHistHtml || '<span class="text-xs text-slate-500">Sem histórico</span>'}</div>
+                    </div>
+
                     <div class="border-t border-slate-800 pt-2">
-                        <p class="text-xs font-bold text-slate-400 uppercase mb-1">Pessoas Vinculadas ao Veículo:</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-1">Pessoas Vinculadas:</p>
                         <ul class="space-y-1">${clientesHtml || '<p class="text-xs text-slate-500">Nenhum cliente cadastrado</p>'}</ul>
                     </div>
                 </div>
             `;
         }
 
-        // CONFIGURAÇÃO / EDIÇÃO DE PROFISSIONAIS
+        // GESTÃO E EDIÇÃO DE CLIENTES
+        async function carregarListaClientes() {
+            const cont = document.getElementById('listaClientes');
+            const { data: clis } = await _supabase.from('clientes').select('*').order('nome');
+            cont.innerHTML = '';
+            if (clis) {
+                clis.forEach(c => {
+                    cont.innerHTML += `
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-white text-sm">${c.nome}</p>
+                                <p class="text-slate-400">Tel: ${c.telefone} ${c.cpf ? '| CPF: ' + c.cpf : ''}</p>
+                            </div>
+                            <button onclick="abrirModalEditarCliente('${c.id}', '${c.nome}', '${c.cpf || ''}', '${c.telefone}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1">
+                                <i class="ph ph-pencil"></i> Editar
+                            </button>
+                        </div>`;
+                });
+            }
+        }
+
+        function abrirModalEditarCliente(id, nome, cpf, tel) {
+            document.getElementById('editClienteId').value = id;
+            document.getElementById('editClienteNome').value = nome;
+            document.getElementById('editClienteCpf').value = cpf;
+            document.getElementById('editClienteTel').value = tel;
+            document.getElementById('modalEditCliente').classList.remove('hidden');
+            document.getElementById('modalEditCliente').classList.add('flex');
+        }
+
+        function fecharModalCliente() {
+            document.getElementById('modalEditCliente').classList.add('hidden');
+            document.getElementById('modalEditCliente').classList.remove('flex');
+        }
+
+        async function salvarEdicaoCliente() {
+            const id = document.getElementById('editClienteId').value;
+            const nome = document.getElementById('editClienteNome').value.trim();
+            const cpf = document.getElementById('editClienteCpf').value.trim();
+            const telefone = document.getElementById('editClienteTel').value.trim();
+
+            if (!nome || !telefone) return alert('Nome e Telefone são obrigatórios.');
+
+            await _supabase.from('clientes').update({ nome, cpf, telefone }).eq('id', id);
+            fecharModalCliente();
+            carregarListaClientes();
+            alert('Cliente atualizado com sucesso!');
+        }
+
+        // HISTÓRICO DE DIAGNÓSTICOS (DETALHADO E EXCLUSÃO)
+        async function carregarListaHistoricoOS() {
+            const cont = document.getElementById('listaHistoricoOS');
+            const { data: osList } = await _supabase
+                .from('ordens_servico')
+                .select(`
+                    id, created_at, observacoes,
+                    profissionais(nome),
+                    veiculos(marca, modelo, placa),
+                    os_itens_marcados(itens_diagnostico(nome))
+                `)
+                .order('created_at', { ascending: false });
+
+            cont.innerHTML = '';
+            if (osList) {
+                osList.forEach(os => {
+                    let defeitos = '';
+                    if (os.os_itens_marcados && os.os_itens_marcados.length > 0) {
+                        defeitos = os.os_itens_marcados.map(i => i.itens_diagnostico ? i.itens_diagnostico.nome : '').join(', ');
+                    }
+
+                    cont.innerHTML += `
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-xs space-y-2">
+                            <div class="flex justify-between items-start border-b border-slate-800 pb-2">
+                                <div>
+                                    <span class="font-bold text-white text-sm">${os.veiculos ? (os.veiculos.marca || '') + ' ' + os.veiculos.modelo : 'Veículo'}</span>
+                                    <span class="text-indigo-400 font-mono ml-2">(${os.veiculos ? mascaraPlacaFormatada(os.veiculos.placa) : ''})</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-slate-500 text-[11px]">${new Date(os.created_at).toLocaleDateString()}</span>
+                                    <button onclick="excluirOS('${os.id}')" class="bg-rose-900/50 hover:bg-rose-800 text-rose-300 p-1.5 rounded-lg border border-rose-700/40" title="Excluir Diagnóstico">
+                                        <i class="ph ph-trash text-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p class="text-slate-300"><b>👨‍🔧 Responsável:</b> ${os.profissionais ? os.profissionais.nome : 'Não informado'}</p>
+                            
+                            <p class="text-slate-300"><b>⚠️ Defeitos Marcados:</b> ${defeitos ? `<span class="text-amber-400">${defeitos}</span>` : '<span class="text-emerald-400">Nenhum defeito marcado</span>'}</p>
+
+                            ${os.observacoes ? `<p class="text-slate-400"><b>📝 Obs:</b> ${os.observacoes}</p>` : ''}
+                        </div>`;
+                });
+            }
+        }
+
+        async function excluirOS(osId) {
+            if (!confirm('Tem certeza que deseja excluir este diagnóstico? Esta ação não pode ser desfeita.')) return;
+
+            const { error } = await _supabase.from('ordens_servico').delete().eq('id', osId);
+            if (error) {
+                alert('Erro ao excluir diagnóstico: ' + error.message);
+            } else {
+                carregarListaHistoricoOS();
+            }
+        }
+
+        // EQUIPE
         async function carregarEquipeConfig() {
             const cont = document.getElementById('listaProfissionaisEdicao');
             const { data: profs } = await _supabase.from('profissionais').select('*').order('nome');
@@ -580,8 +781,8 @@
                     cont.innerHTML += `
                         <div class="flex items-center gap-2 bg-slate-800 p-2 rounded-lg">
                             <input type="text" id="prof-nome-${p.id}" value="${p.nome}" class="flex-1 bg-slate-900 p-2 rounded text-xs text-white border border-slate-700">
-                            <button onclick="atualizarProfissional(${p.id})" class="bg-emerald-600 text-white text-xs px-3 py-2 rounded">Salvar</button>
-                            <button onclick="excluirProfissional(${p.id})" class="bg-rose-600 text-white text-xs px-3 py-2 rounded">Excluir</button>
+                            <button onclick="atualizarProfissional(${p.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2 rounded font-semibold">Salvar</button>
+                            <button onclick="excluirProfissional(${p.id})" class="bg-rose-600 hover:bg-rose-500 text-white text-xs px-3 py-2 rounded font-semibold">Excluir</button>
                         </div>
                     `;
                 });
@@ -612,38 +813,116 @@
             carregarProfissionaisSelect();
         }
 
-        async function carregarListaClientes() {
-            const cont = document.getElementById('listaClientes');
-            const { data: clis } = await _supabase.from('clientes').select('*').order('nome');
+        // GERENCIAMENTO DE CATEGORIAS E ITENS DE DIAGNÓSTICO
+        async function carregarDiagnosticosConfig() {
+            const cont = document.getElementById('listaDiagnosticosConfig');
+            const { data: categorias } = await _supabase.from('categorias_diagnostico').select(`id, nome, itens_diagnostico(id, nome)`).order('id');
+            
             cont.innerHTML = '';
-            if (clis) {
-                clis.forEach(c => {
+            if (categorias && categorias.length > 0) {
+                categorias.forEach(cat => {
+                    let itensHtml = '';
+                    if (cat.itens_diagnostico && cat.itens_diagnostico.length > 0) {
+                        cat.itens_diagnostico.forEach(item => {
+                            itensHtml += `
+                                <div class="flex items-center gap-2 bg-slate-900 p-2 rounded border border-slate-700">
+                                    <input type="text" id="item-nome-${item.id}" value="${item.nome}" class="flex-1 bg-slate-800 p-1.5 rounded text-xs text-slate-200 border border-slate-600 outline-none">
+                                    <button onclick="atualizarItemDiag(${item.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] px-2.5 py-1.5 rounded font-semibold">Salvar</button>
+                                    <button onclick="excluirItemDiag(${item.id})" class="bg-rose-900/60 hover:bg-rose-800 text-rose-300 text-[11px] px-2.5 py-1.5 rounded font-semibold border border-rose-700/50">Excluir</button>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        itensHtml = `<p class="text-xs text-slate-500 italic">Nenhum item nesta categoria.</p>`;
+                    }
+
                     cont.innerHTML += `
-                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs flex justify-between items-center">
-                            <div>
-                                <p class="font-bold text-white text-sm">${c.nome}</p>
-                                <p class="text-slate-400">Tel: ${c.telefone}</p>
+                        <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700 space-y-3">
+                            <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                                <span class="text-xs font-bold text-amber-400 uppercase tracking-wide">${cat.nome}</span>
+                                <button onclick="excluirCategoriaDiag(${cat.id})" class="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1">
+                                    <i class="ph ph-trash"></i> Excluir Categoria
+                                </button>
                             </div>
-                        </div>`;
+
+                            <div class="space-y-2">
+                                ${itensHtml}
+                            </div>
+
+                            <!-- Adicionar Novo Item nesta Categoria -->
+                            <div class="flex gap-2 pt-1">
+                                <input type="text" id="novoItemCat-${cat.id}" placeholder="Novo item para ${cat.nome}" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded text-xs text-white outline-none">
+                                <button onclick="cadastrarItemDiag(${cat.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded text-xs">
+                                    + Adicionar Item
+                                </button>
+                            </div>
+                        </div>
+                    `;
                 });
+            } else {
+                cont.innerHTML = `<p class="text-xs text-slate-500">Nenhuma categoria cadastrada.</p>`;
             }
         }
 
-        async function carregarListaHistoricoOS() {
-            const cont = document.getElementById('listaHistoricoOS');
-            const { data: osList } = await _supabase.from('ordens_servico').select('*, veiculos(modelo, placa)').order('created_at', { ascending: false });
-            cont.innerHTML = '';
-            if (osList) {
-                osList.forEach(os => {
-                    cont.innerHTML += `
-                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs space-y-1">
-                            <div class="flex justify-between font-bold text-indigo-400">
-                                <span>${os.veiculos ? os.veiculos.modelo : 'Veículo'} (${os.veiculos ? mascaraPlacaFormatada(os.veiculos.placa) : ''})</span>
-                                <span class="text-slate-400">${new Date(os.created_at).toLocaleDateString()}</span>
-                            </div>
-                            <p class="text-slate-300">Obs: ${os.observacoes || 'Sem observações'}</p>
-                        </div>`;
-                });
+        async function cadastrarCategoria() {
+            const nome = document.getElementById('novaCategoriaNome').value.trim();
+            if (!nome) return alert('Digite o nome da categoria.');
+
+            const { error } = await _supabase.from('categorias_diagnostico').insert([{ nome: nome.toUpperCase() }]);
+            if (error) {
+                alert('Erro ao criar categoria: ' + error.message);
+            } else {
+                document.getElementById('novaCategoriaNome').value = '';
+                carregarDiagnosticosConfig();
+            }
+        }
+
+        async function excluirCategoriaDiag(catId) {
+            if (!confirm('Deseja realmente excluir esta categoria e todos os seus itens?')) return;
+
+            const { error } = await _supabase.from('categorias_diagnostico').delete().eq('id', catId);
+            if (error) {
+                alert('Erro ao excluir categoria: ' + error.message);
+            } else {
+                carregarDiagnosticosConfig();
+            }
+        }
+
+        async function cadastrarItemDiag(catId) {
+            const input = document.getElementById(`novoItemCat-${catId}`);
+            const nome = input.value.trim();
+            if (!nome) return alert('Digite o nome do item de diagnóstico.');
+
+            const { error } = await _supabase.from('itens_diagnostico').insert([{ categoria_id: catId, nome }]);
+            if (error) {
+                alert('Erro ao adicionar item: ' + error.message);
+            } else {
+                input.value = '';
+                carregarDiagnosticosConfig();
+            }
+        }
+
+        async function atualizarItemDiag(itemId) {
+            const novoNome = document.getElementById(`item-nome-${itemId}`).value.trim();
+            if (!novoNome) return alert('O nome do item não pode estar vazio.');
+
+            const { error } = await _supabase.from('itens_diagnostico').update({ nome: novoNome }).eq('id', itemId);
+            if (error) {
+                alert('Erro ao atualizar item: ' + error.message);
+            } else {
+                alert('Item atualizado com sucesso!');
+                carregarDiagnosticosConfig();
+            }
+        }
+
+        async function excluirItemDiag(itemId) {
+            if (!confirm('Deseja excluir este item de diagnóstico?')) return;
+
+            const { error } = await _supabase.from('itens_diagnostico').delete().eq('id', itemId);
+            if (error) {
+                alert('Erro ao excluir item: ' + error.message);
+            } else {
+                carregarDiagnosticosConfig();
             }
         }
     </script>
