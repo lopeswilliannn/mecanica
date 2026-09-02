@@ -28,11 +28,17 @@
             </div>
 
             <nav class="hidden md:flex flex-col gap-2 w-full mt-8">
-                <button onclick="mudarAba('novaOS')" id="btnNav-novaOS" class="nav-item active flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                <button onclick="mudarAba('kanban')" id="btnNav-kanban" class="nav-item active flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                    <i class="ph ph-kanban text-lg"></i> Kanban (OS)
+                </button>
+                <button onclick="mudarAba('novaOS')" id="btnNav-novaOS" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
                     <i class="ph ph-plus-circle text-lg"></i> Novo Diagnóstico
                 </button>
                 <button onclick="mudarAba('orcamento')" id="btnNav-orcamento" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
                     <i class="ph ph-calculator text-lg"></i> Criar Orçamento
+                </button>
+                <button onclick="mudarAba('gerenciarOrcamentos')" id="btnNav-gerenciarOrcamentos" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                    <i class="ph ph-currency-dollar text-lg"></i> Financeiro & Cobrança
                 </button>
                 <button onclick="mudarAba('buscarPlaca')" id="btnNav-buscarPlaca" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
                     <i class="ph ph-magnifying-glass text-lg"></i> Buscar Placa
@@ -42,6 +48,9 @@
                 </button>
                 <button onclick="mudarAba('historico')" id="btnNav-historico" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
                     <i class="ph ph-file-text text-lg"></i> Diagnósticos Salvos
+                </button>
+                <button onclick="mudarAba('relatorios')" id="btnNav-relatorios" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
+                    <i class="ph ph-chart-line-up text-lg"></i> Relatório Financeiro
                 </button>
                 <button onclick="mudarAba('config')" id="btnNav-config" class="nav-item flex items-center gap-3 p-3 rounded-xl font-medium text-sm transition">
                     <i class="ph ph-gear text-lg"></i> Ajustes / Equipas
@@ -80,15 +89,30 @@
             <!-- CONTEÚDO AUTENTICADO -->
             <div id="conteudoApp" class="hidden space-y-6">
 
+                <!-- ABA 0: KANBAN DE OS -->
+                <section id="aba-kanban" class="aba-conteudo space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="ph ph-kanban text-indigo-400"></i> Acompanhamento de Ordens de Serviço
+                        </h2>
+                        <button onclick="carregarKanban()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                            <i class="ph ph-arrows-clockwise text-sm"></i> Atualizar
+                        </button>
+                    </div>
+                    <div id="kanbanContainer" class="flex gap-4 overflow-x-auto pb-4 pt-2">
+                        <!-- Colunas Kanban injetadas via JS -->
+                    </div>
+                </section>
+
                 <!-- ABA 1: NOVO DIAGNÓSTICO -->
-                <section id="aba-novaOS" class="aba-conteudo space-y-4">
+                <section id="aba-novaOS" class="aba-conteudo hidden space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                         <h2 class="text-lg font-bold text-white flex items-center gap-2">
                             <i class="ph ph-clipboard-text text-indigo-400"></i> Vistoria / Check-up
                         </h2>
                     </div>
 
-                    <!-- Selección do Profissional -->
+                    <!-- Seleção do Profissional -->
                     <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-2">
                         <span class="text-xs text-slate-400 font-medium">Técnico Responsável:</span>
                         <select id="selectProfissional" class="bg-slate-800 text-white text-xs font-semibold p-2 rounded-lg border border-slate-600 outline-none w-full sm:w-auto">
@@ -206,8 +230,8 @@
 
                     <!-- Dados Básicos -->
                     <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Identificação do Cliente / Veículo</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Identificação do Cliente / Veículo & Cobrança</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                                 <label class="text-xs text-slate-400">Placa (Busca Auto)</label>
                                 <input type="text" id="orcPlaca" oninput="mascaraEBuscarPlacaOrcamento(this)" placeholder="ABC-1D23" maxlength="8" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white font-mono uppercase text-sm outline-none focus:border-indigo-500">
@@ -223,6 +247,10 @@
                             <div>
                                 <label class="text-xs text-slate-400">WhatsApp / Tel *</label>
                                 <input type="tel" id="orcClienteTel" placeholder="5511999999999" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="text-xs text-slate-400">Chave PIX (Para pagamento do Cliente)</label>
+                                <input type="text" id="orcChavePix" placeholder="CNPJ, E-mail, Telefone ou Aleatória" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
                             </div>
                         </div>
                     </div>
@@ -253,9 +281,45 @@
                         <textarea id="orcObs" rows="2" placeholder="Ex: Validade deste orçamento: 5 dias. Pagamento em até 3x sem juros." class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none"></textarea>
                     </div>
 
-                    <button onclick="enviarOrcamentoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl text-sm shadow-lg flex items-center justify-center gap-2">
-                        <i class="ph ph-whatsapp-logo text-xl"></i> Gerar e Enviar Orçamento no WhatsApp
-                    </button>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="salvarEEstipularOrcamento(false)" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold p-3.5 rounded-xl text-sm transition">
+                            Apenas Salvar no Sistema
+                        </button>
+                        <button onclick="salvarEEstipularOrcamento(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl text-sm shadow-lg flex items-center justify-center gap-2 transition">
+                            <i class="ph ph-whatsapp-logo text-xl"></i> Salvar e Enviar no WhatsApp
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ABA 2.5: GERENCIAR ORÇAMENTOS E FINANCEIRO -->
+                <section id="aba-gerenciarOrcamentos" class="aba-conteudo hidden space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="ph ph-currency-dollar text-indigo-400"></i> Gestão Financeira & Cobranças
+                        </h2>
+                        <button onclick="carregarListaOrcamentosFinanceiro()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                            <i class="ph ph-arrows-clockwise text-sm"></i> Atualizar
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-800 text-slate-400 uppercase font-bold border-b border-slate-700">
+                                <tr>
+                                    <th class="p-3"># ID</th>
+                                    <th class="p-3">Cliente / Veículo</th>
+                                    <th class="p-3">Valor Final</th>
+                                    <th class="p-3">Total Pago</th>
+                                    <th class="p-3">Status Fin.</th>
+                                    <th class="p-3">Aprovação</th>
+                                    <th class="p-3 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaOrcamentosFinanceiro" class="divide-y divide-slate-800">
+                                <tr><td colspan="7" class="p-4 text-center text-slate-500">Carregando orçamentos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
                 <!-- ABA 3: BUSCA POR PLACA -->
@@ -286,6 +350,36 @@
                         <i class="ph ph-file-text text-indigo-400"></i> Diagnósticos Salvos
                     </h2>
                     <div id="listaHistoricoOS" class="space-y-3">Carregando histórico...</div>
+                </section>
+
+                <!-- ABA 5.5: RELATÓRIOS FINANCEIROS -->
+                <section id="aba-relatorios" class="aba-conteudo hidden space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="ph ph-chart-line-up text-indigo-400"></i> Relatório de Vendas e Faturamento
+                        </h2>
+                        <button onclick="carregarRelatorioFinanceiro()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                            <i class="ph ph-arrows-clockwise text-sm"></i> Atualizar
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-800 text-slate-400 uppercase font-bold border-b border-slate-700">
+                                <tr>
+                                    <th class="p-3"># ID</th>
+                                    <th class="p-3">Valor Total</th>
+                                    <th class="p-3">Desconto</th>
+                                    <th class="p-3">Valor Final</th>
+                                    <th class="p-3">Valor Pago</th>
+                                    <th class="p-3">Status Financeiro</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaRelatorioCorpo" class="divide-y divide-slate-800">
+                                <tr><td colspan="6" class="p-4 text-center text-slate-500">Carregando dados...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
                 <!-- ABA 6: AJUSTES E EQUIPE -->
@@ -343,17 +437,17 @@
 
         <!-- NAVEGAÇÃO MOBILE INFERIOR -->
         <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 flex justify-around p-2 z-40">
-            <button onclick="mudarAba('novaOS')" id="btnNavMob-novaOS" class="nav-item-mob active flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
+            <button onclick="mudarAba('kanban')" id="btnNavMob-kanban" class="nav-item-mob active flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
+                <i class="ph ph-kanban text-xl"></i> OS
+            </button>
+            <button onclick="mudarAba('novaOS')" id="btnNavMob-novaOS" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
                 <i class="ph ph-plus-circle text-xl"></i> Vistoria
             </button>
             <button onclick="mudarAba('orcamento')" id="btnNavMob-orcamento" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
                 <i class="ph ph-calculator text-xl"></i> Orçamento
             </button>
-            <button onclick="mudarAba('buscarPlaca')" id="btnNavMob-buscarPlaca" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
-                <i class="ph ph-magnifying-glass text-xl"></i> Placa
-            </button>
-            <button onclick="mudarAba('clientes')" id="btnNavMob-clientes" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
-                <i class="ph ph-users text-xl"></i> Clientes
+            <button onclick="mudarAba('gerenciarOrcamentos')" id="btnNavMob-gerenciarOrcamentos" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
+                <i class="ph ph-currency-dollar text-xl"></i> Finanças
             </button>
             <button onclick="mudarAba('historico')" id="btnNavMob-historico" class="nav-item-mob flex flex-col items-center gap-1 text-slate-400 text-[10px] p-1">
                 <i class="ph ph-file-text text-xl"></i> Histórico
@@ -388,6 +482,30 @@
             <div class="flex justify-end gap-2 pt-2">
                 <button onclick="fecharModalCliente()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold">Cancelar</button>
                 <button onclick="salvarEdicaoCliente()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE REGISTRO DE PAGAMENTO -->
+    <div id="modalPagamento" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 w-full max-w-md space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-white text-base">Registrar Pagamento</h3>
+                <button onclick="fecharModalPagamento()" class="text-slate-400 hover:text-white font-bold">✕</button>
+            </div>
+            <input type="hidden" id="payOrcamentoId">
+            <input type="hidden" id="payValorFinalAtual">
+            <div>
+                <label class="text-xs text-slate-400">Valor Pago Nesta Transação (R$)</label>
+                <input type="number" step="0.01" id="payValorPago" placeholder="0.00" class="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm outline-none">
+            </div>
+            <div>
+                <label class="text-xs text-slate-400">Desconto Concedido no Total (R$)</label>
+                <input type="number" step="0.01" id="payDesconto" placeholder="0.00" value="0" class="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm outline-none">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="fecharModalPagamento()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold">Cancelar</button>
+                <button onclick="confirmarPagamento()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold">Confirmar Pagamento</button>
             </div>
         </div>
     </div>
@@ -429,7 +547,8 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item-mob').forEach(el => el.classList.remove('active'));
 
-            document.getElementById(`aba-${abaId}`).classList.remove('hidden');
+            const targetSection = document.getElementById(`aba-${abaId}`);
+            if (targetSection) targetSection.classList.remove('hidden');
             
             const btnDesktop = document.getElementById(`btnNav-${abaId}`);
             if(btnDesktop) btnDesktop.classList.add('active');
@@ -437,12 +556,15 @@
             const btnMob = document.getElementById(`btnNavMob-${abaId}`);
             if(btnMob) btnMob.classList.add('active');
 
+            if(abaId === 'kanban') carregarKanban();
             if(abaId === 'novaOS') carregarChecklistDinamico();
             if(abaId === 'orcamento' && document.querySelectorAll('.linha-orcamento').length === 0) {
                 adicionarLinhaOrcamento();
             }
+            if(abaId === 'gerenciarOrcamentos') carregarListaOrcamentosFinanceiro();
             if(abaId === 'clientes') carregarListaClientes();
             if(abaId === 'historico') carregarListaHistoricoOS();
+            if(abaId === 'relatorios') carregarRelatorioFinanceiro();
             if(abaId === 'config') {
                 carregarEquipeConfig();
                 carregarDiagnosticosConfig();
@@ -474,10 +596,69 @@
             document.getElementById('telaLogin').classList.add('hidden');
             document.getElementById('conteudoApp').classList.remove('hidden');
             carregarProfissionaisSelect();
+            carregarKanban();
             carregarChecklistDinamico();
         }
 
+        // ========================================================
+        // KANBAN DE OS
+        // ========================================================
+        const statusKanbanList = ['Em Diagnóstico', 'Aguardando Peças', 'Em Execução', 'Pronto para Retirada', 'Finalizado'];
+
+        async function carregarKanban() {
+            const container = document.getElementById('kanbanContainer');
+            if(!container) return;
+            container.innerHTML = '';
+
+            const { data: ordens } = await _supabase.from('ordens_servico').select('*, veiculos(modelo, placa)');
+
+            statusKanbanList.forEach(status => {
+                const col = document.createElement('div');
+                col.className = 'flex-1 min-w-[260px] bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col gap-3';
+                col.innerHTML = `<h3 class="font-bold text-xs uppercase text-indigo-400 tracking-wider border-b border-slate-800 pb-2">${status}</h3>`;
+
+                const ordensFiltradas = ordens ? ordens.filter(o => (o.status || 'Em Diagnóstico') === status) : [];
+
+                const listDiv = document.createElement('div');
+                listDiv.className = 'space-y-2 flex-1';
+
+                if (ordensFiltradas.length === 0) {
+                    listDiv.innerHTML = `<p class="text-[11px] text-slate-500 italic">Nenhuma OS</p>`;
+                } else {
+                    ordensFiltradas.forEach(os => {
+                        const card = document.createElement('div');
+                        card.className = 'bg-slate-800 p-3 rounded-lg border-l-4 border-indigo-500 shadow space-y-2 text-xs';
+                        
+                        let selectHtml = `<select onchange="atualizarStatusOS(${os.id}, this.value)" class="w-full bg-slate-900 text-white text-[11px] p-1.5 rounded border border-slate-700 outline-none">`;
+                        statusKanbanList.forEach(s => {
+                            selectHtml += `<option value="${s}" ${(os.status || 'Em Diagnóstico') === s ? 'selected' : ''}>${s}</option>`;
+                        });
+                        selectHtml += `</select>`;
+
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <span class="font-bold text-white">#${os.id} - ${os.veiculos ? os.veiculos.modelo : 'Veículo'}</span>
+                                <span class="font-mono text-[10px] text-indigo-300 bg-indigo-950 px-1.5 py-0.5 rounded border border-indigo-800">${os.veiculos ? mascaraPlacaFormatada(os.veiculos.placa) : 'N/A'}</span>
+                            </div>
+                            ${os.observacoes ? `<p class="text-[11px] text-slate-400 line-clamp-2">${os.observacoes}</p>` : ''}
+                            ${selectHtml}
+                        `;
+                        listDiv.appendChild(card);
+                    });
+                }
+
+                col.appendChild(listDiv);
+                container.appendChild(col);
+            });
+        }
+
+        async function atualizarStatusOS(osId, novoStatus) {
+            await _supabase.from('ordens_servico').update({ status: novoStatus }).eq('id', osId);
+            carregarKanban();
+        }
+
         function mascaraPlacaFormatada(v) {
+            if(!v) return '';
             v = v.toUpperCase().replace(/[^A-Z0-9]/g, '');
             if (v.length > 7) v = v.substring(0, 7);
             if (/^[A-Z]{3}[0-9]{4}$/.test(v)) {
@@ -543,7 +724,7 @@
             const { data: profs } = await _supabase.from('profissionais').select('*').order('nome');
             select.innerHTML = '';
             if (profs) {
-                profs.forEach(p => select.innerHTML += `<option value="${p.id}">${p.nome} (${p.cargo})</option>`);
+                profs.forEach(p => select.innerHTML += `<option value="${p.id}">${p.nome} (${p.cargo || 'Técnico'})</option>`);
             }
         }
 
@@ -628,65 +809,226 @@
             return total;
         }
 
-        function enviarOrcamentoWhatsApp() {
+        async function salvarEEstipularOrcamento(enviarWhats = false) {
             const cliente = document.getElementById('orcClienteNome').value.trim();
             const veiculo = document.getElementById('orcVeiculo').value.trim();
-            const placa = document.getElementById('orcPlaca').value.trim();
+            const placa = document.getElementById('orcPlaca').value.replace('-', '').trim();
             const tel = document.getElementById('orcClienteTel').value.trim();
+            const chavePix = document.getElementById('orcChavePix').value.trim();
             const obs = document.getElementById('orcObs').value.trim();
 
-            if (!cliente || !tel) {
-                return alert('Preencha ao menos o Nome e o WhatsApp do cliente.');
-            }
+            if (!cliente || !tel) return alert('Preencha ao menos o Nome e o WhatsApp do cliente.');
 
             const linhas = document.querySelectorAll('.linha-orcamento');
-            if (linhas.length === 0) {
-                return alert('Adicione pelo menos um item ao orçamento.');
-            }
+            if (linhas.length === 0) return alert('Adicione pelo menos um item ao orçamento.');
 
-            let itensTexto = '';
             let totalGeral = 0;
-            let temItemValido = false;
+            const itensParaSalvar = [];
 
-            linhas.forEach((l, index) => {
+            linhas.forEach((l) => {
                 const desc = l.querySelector('.orc-desc').value.trim();
                 const qtd = parseFloat(l.querySelector('.orc-qtd').value) || 0;
                 const valUnit = parseFloat(l.querySelector('.orc-val').value) || 0;
 
                 if (desc && qtd > 0) {
-                    temItemValido = true;
                     const subtotal = qtd * valUnit;
                     totalGeral += subtotal;
-
-                    const fmtUnit = valUnit.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    const fmtSub = subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-                    itensTexto += `${index + 1}. *${desc}*\n   ↳ Qtd: ${qtd} x ${fmtUnit} = *${fmtSub}*\n`;
+                    itensParaSalvar.push({ descricao: desc, quantidade: qtd, valor_unitario: valUnit, subtotal });
                 }
             });
 
-            if (!temItemValido) {
-                return alert('Preencha a descrição de pelo menos um item do orçamento.');
+            if (itensParaSalvar.length === 0) return alert('Preencha a descrição de pelo menos um item do orçamento.');
+
+            // Identificar Veículo e Cliente se existirem
+            let veiculoId = null;
+            let clienteId = null;
+
+            if (placa) {
+                const { data: v } = await _supabase.from('veiculos').select('id').eq('placa', placa).maybeSingle();
+                if(v) veiculoId = v.id;
+            }
+            if (tel) {
+                const { data: c } = await _supabase.from('clientes').select('id').eq('telefone', tel).maybeSingle();
+                if(c) clienteId = c.id;
             }
 
-            const fmtTotalGeral = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            // Inserir Orçamento
+            const token = Math.random().toString(36).substring(2, 10);
+            const { data: orc, error } = await _supabase.from('orcamentos').insert([{
+                veiculo_id: veiculoId,
+                cliente_id: clienteId,
+                valor_total: totalGeral,
+                valor_final: totalGeral,
+                chave_pix: chavePix,
+                token_aprovacao: token,
+                status_financeiro: 'Pendente',
+                status_aprovacao: 'Pendente'
+            }]).select().single();
 
-            let msg = `*Mecânica Salvati* 🛠️\n`;
-            msg += `📄 *ORÇAMENTO DE SERVIÇOS / PEÇAS*\n\n`;
-            msg += `Olá, *${cliente}*!\n`;
-            if (veiculo || placa) {
-                msg += `Veículo: *${veiculo}* ${placa ? '(' + placa + ')' : ''}\n`;
+            if (error) return alert('Erro ao salvar orçamento: ' + error.message);
+
+            const itensFormatados = itensParaSalvar.map(i => ({ orcamento_id: orc.id, ...i }));
+            await _supabase.from('orcamento_itens').insert(itensFormatados);
+
+            alert('Orçamento salvo com sucesso!');
+
+            if (enviarWhats) {
+                let itensTexto = '';
+                itensParaSalvar.forEach((item, index) => {
+                    const fmtUnit = item.valor_unitario.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    const fmtSub = item.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    itensTexto += `${index + 1}. *${item.descricao}*\n   ↳ Qtd: ${item.quantidade} x ${fmtUnit} = *${fmtSub}*\n`;
+                });
+
+                const fmtTotalGeral = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                let msg = `*Mecânica Salvati* 🛠️\n`;
+                msg += `📄 *ORÇAMENTO DE SERVIÇOS / PEÇAS*\n\n`;
+                msg += `Olá, *${cliente}*!\n`;
+                if (veiculo || placa) msg += `Veículo: *${veiculo}* ${placa ? '(' + mascaraPlacaFormatada(placa) + ')' : ''}\n`;
+                msg += `\n📋 *Detalhamento dos Itens:*\n${itensTexto}\n`;
+                msg += `💰 *VALOR TOTAL: ${fmtTotalGeral}*\n`;
+                if (chavePix) msg += `\n🔑 *Chave PIX para pagamento:* ${chavePix}\n`;
+                if (obs) msg += `\n📝 *Observações:* ${obs}\n`;
+                msg += `\nFicamos no aguardo da sua aprovação! Se tiver dúvidas, estamos à disposição.`;
+
+                window.open(`https://api.whatsapp.com/send?phone=${tel.replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`, '_blank');
             }
-            msg += `\n📋 *Detalhamento dos Itens:*\n${itensTexto}\n`;
-            msg += `💰 *VALOR TOTAL: ${fmtTotalGeral}*\n`;
 
-            if (obs) {
-                msg += `\n📝 *Observações:* ${obs}\n`;
+            // Limpar formulário
+            document.getElementById('containerItensOrcamento').innerHTML = '';
+            document.getElementById('orcObs').value = '';
+            adicionarLinhaOrcamento();
+        }
+
+        // FINANCEIRO E COBRANÇAS
+        async function carregarListaOrcamentosFinanceiro() {
+            const tbody = document.getElementById('tabelaOrcamentosFinanceiro');
+            if(!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">Carregando orçamentos...</td></tr>';
+
+            const { data: orcamentos } = await _supabase.from('orcamentos').select('*, clientes(nome, telefone), veiculos(modelo, placa)').order('id', { ascending: false });
+
+            tbody.innerHTML = '';
+            if (orcamentos && orcamentos.length > 0) {
+                orcamentos.forEach(o => {
+                    const totalPago = o.valor_pago || 0;
+                    const valFinal = o.valor_final || 0;
+                    
+                    let badgeClass = 'bg-amber-950 text-amber-300 border-amber-800';
+                    if (o.status_financeiro === 'Pago') badgeClass = 'bg-emerald-950 text-emerald-300 border-emerald-800';
+                    if (o.status_financeiro === 'Pago Parcial') badgeClass = 'bg-sky-950 text-sky-300 border-sky-800';
+
+                    const clienteNome = o.clientes ? o.clientes.nome : 'N/A';
+                    const veicNome = o.veiculos ? o.veiculos.modelo : 'N/A';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/50">
+                            <td class="p-3 font-mono font-bold">#${o.id}</td>
+                            <td class="p-3">
+                                <div><b>${veicNome}</b></div>
+                                <div class="text-[11px] text-slate-400">${clienteNome}</div>
+                            </td>
+                            <td class="p-3 font-bold text-white">R$ ${valFinal.toFixed(2)}</td>
+                            <td class="p-3 text-emerald-400 font-medium">R$ ${totalPago.toFixed(2)}</td>
+                            <td class="p-3">
+                                <span class="px-2 py-0.5 rounded-full border text-[10px] font-bold ${badgeClass}">
+                                    ${o.status_financeiro || 'Pendente'}
+                                </span>
+                            </td>
+                            <td class="p-3">${o.status_aprovacao || 'Pendente'}</td>
+                            <td class="p-3 text-right space-x-1">
+                                <button onclick="abrirModalPagamento(${o.id}, ${valFinal})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded text-[11px] font-semibold">Pagar</button>
+                                <button onclick="notificarOrcamentoWhats(${o.id}, '${o.token_aprovacao || ''}', ${valFinal}, '${o.chave_pix || ''}', '${o.clientes ? o.clientes.telefone : ''}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-[11px] font-semibold">WhatsApp</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">Nenhum orçamento cadastrado.</td></tr>';
+            }
+        }
+
+        function abrirModalPagamento(id, valorFinal) {
+            document.getElementById('payOrcamentoId').value = id;
+            document.getElementById('payValorFinalAtual').value = valorFinal;
+            document.getElementById('payValorPago').value = '';
+            document.getElementById('payDesconto').value = '0';
+            document.getElementById('modalPagamento').classList.remove('hidden');
+            document.getElementById('modalPagamento').classList.add('flex');
+        }
+
+        function fecharModalPagamento() {
+            document.getElementById('modalPagamento').classList.add('hidden');
+            document.getElementById('modalPagamento').classList.remove('flex');
+        }
+
+        async function confirmarPagamento() {
+            const id = document.getElementById('payOrcamentoId').value;
+            const valorFinalAtual = parseFloat(document.getElementById('payValorFinalAtual').value) || 0;
+            const valorPagoTransacao = parseFloat(document.getElementById('payValorPago').value) || 0;
+            const desconto = parseFloat(document.getElementById('payDesconto').value) || 0;
+
+            if (valorPagoTransacao <= 0 && desconto <= 0) {
+                return alert('Informe um valor pago ou desconto válido.');
             }
 
-            msg += `\nFicamos no aguardo da sua aprovação! Se tiver dúvidas, estamos à disposição.`;
+            const novoValorFinal = Math.max(0, valorFinalAtual - desconto);
+
+            const { data: orc } = await _supabase.from('orcamentos').select('valor_pago').eq('id', id).single();
+            const acumuladoPago = (orc ? orc.valor_pago || 0 : 0) + valorPagoTransacao;
+
+            let status_financeiro = 'Pago Parcial';
+            if (acumuladoPago >= novoValorFinal) status_financeiro = 'Pago';
+
+            await _supabase.from('orcamentos').update({
+                desconto,
+                valor_final: novoValorFinal,
+                valor_pago: acumuladoPago,
+                status_financeiro
+            }).eq('id', id);
+
+            alert('Pagamento registrado com sucesso!');
+            fecharModalPagamento();
+            carregarListaOrcamentosFinanceiro();
+        }
+
+        function notificarOrcamentoWhats(id, token, valor, pix, telExistente) {
+            let tel = telExistente || prompt('Digite o telefone do cliente com DDD:');
+            if (!tel) return;
+
+            const link = `${window.location.origin}/aprovar.html?id=${id}&token=${token}`;
+            let msg = `Olá! Segue o link para conferir o seu orçamento no valor de R$ ${valor.toFixed(2)}:\n${link}`;
+            if (pix) msg += `\n\nChave PIX: ${pix}`;
 
             window.open(`https://api.whatsapp.com/send?phone=${tel.replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        // RELATÓRIOS
+        async function carregarRelatorioFinanceiro() {
+            const tbody = document.getElementById('tabelaRelatorioCorpo');
+            if(!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Carregando dados...</td></tr>';
+
+            const { data: relatorio } = await _supabase.from('orcamentos').select('*').order('id', { ascending: false });
+
+            tbody.innerHTML = '';
+            if (relatorio && relatorio.length > 0) {
+                relatorio.forEach(r => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/50">
+                            <td class="p-3 font-mono font-bold">#${r.id}</td>
+                            <td class="p-3">R$ ${(r.valor_total || 0).toFixed(2)}</td>
+                            <td class="p-3 text-rose-400">R$ ${(r.desconto || 0).toFixed(2)}</td>
+                            <td class="p-3 font-bold text-white">R$ ${(r.valor_final || 0).toFixed(2)}</td>
+                            <td class="p-3 text-emerald-400">R$ ${(r.valor_pago || 0).toFixed(2)}</td>
+                            <td class="p-3 font-semibold">${r.status_financeiro || 'Pendente'}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Nenhum dado encontrado.</td></tr>';
+            }
         }
 
         // SALVAR OS COM DADOS DETALHADOS DE VEÍCULO E HISTÓRICO DE KM
@@ -759,7 +1101,8 @@
             const { data: os } = await _supabase.from('ordens_servico').insert([{
                 veiculo_id: veiculo.id,
                 profissional_id: profId ? parseInt(profId) : null,
-                observacoes: obs
+                observacoes: obs,
+                status: 'Em Diagnóstico'
             }]).select().single();
 
             // 5. Itens marcados
@@ -795,6 +1138,7 @@
 
             window.open(`https://api.whatsapp.com/send?phone=${telCliente.replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`, '_blank');
             alert('Diagnóstico registrado com sucesso!');
+            carregarKanban();
         }
 
         // BUSCA POR PLACA COM HISTÓRICO DE KM E REVISÕES
@@ -918,7 +1262,7 @@
             const { data: osList } = await _supabase
                 .from('ordens_servico')
                 .select(`
-                    id, created_at, observacoes,
+                    id, created_at, observacoes, status,
                     profissionais(nome),
                     veiculos(marca, modelo, placa),
                     os_itens_marcados(itens_diagnostico(nome))
@@ -941,6 +1285,7 @@
                                     <span class="text-indigo-400 font-mono ml-2">(${os.veiculos ? mascaraPlacaFormatada(os.veiculos.placa) : ''})</span>
                                 </div>
                                 <div class="flex items-center gap-2">
+                                    <span class="bg-slate-800 text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-700">${os.status || 'Em Diagnóstico'}</span>
                                     <span class="text-slate-500 text-[11px]">${new Date(os.created_at).toLocaleDateString()}</span>
                                     <button onclick="excluirOS('${os.id}')" class="bg-rose-900/50 hover:bg-rose-800 text-rose-300 p-1.5 rounded-lg border border-rose-700/40" title="Excluir Diagnóstico">
                                         <i class="ph ph-trash text-sm"></i>
@@ -966,6 +1311,7 @@
                 alert('Erro ao excluir diagnóstico: ' + error.message);
             } else {
                 carregarListaHistoricoOS();
+                carregarKanban();
             }
         }
 
