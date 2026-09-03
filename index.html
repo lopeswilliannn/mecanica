@@ -91,13 +91,16 @@
 
                 <!-- ABA 0: KANBAN DE OS -->
                 <section id="aba-kanban" class="aba-conteudo space-y-4">
-                    <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700 pb-3 gap-3">
                         <h2 class="text-lg font-bold text-white flex items-center gap-2">
                             <i class="ph ph-kanban text-indigo-400"></i> Acompanhamento de Ordens de Serviço
                         </h2>
-                        <button onclick="carregarKanban()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
-                            <i class="ph ph-arrows-clockwise text-sm"></i> Atualizar
-                        </button>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <input type="text" id="filtroKanbanPlaca" oninput="filtrarCardsKanban()" placeholder="Filtrar por placa ou modelo..." class="bg-slate-900 border border-slate-700 text-xs px-3 py-1.5 rounded-lg text-white outline-none focus:border-indigo-500 w-full sm:w-48">
+                            <button onclick="carregarKanban()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shrink-0">
+                                <i class="ph ph-arrows-clockwise text-sm"></i> Atualizar
+                            </button>
+                        </div>
                     </div>
                     <div id="kanbanContainer" class="flex gap-4 overflow-x-auto pb-4 pt-2">
                         <!-- Colunas Kanban injetadas via JS -->
@@ -249,7 +252,7 @@
                                 <input type="tel" id="orcClienteTel" placeholder="5511999999999" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="text-xs text-slate-400">Chave PIX (Para pagamento do Cliente)</label>
+                                <label class="text-xs text-slate-400">Chave PIX (Opcional - Para Pagamento do Cliente)</label>
                                 <input type="text" id="orcChavePix" placeholder="CNPJ, E-mail, Telefone ou Aleatória" class="w-full p-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm outline-none">
                             </div>
                         </div>
@@ -601,21 +604,33 @@
         }
 
         // ========================================================
-        // KANBAN DE OS
+        // KANBAN DE OS (ORDENAÇÃO POR DATA, BORDAS DE CORES & FILTRO)
         // ========================================================
         const statusKanbanList = ['Em Diagnóstico', 'Aguardando Peças', 'Em Execução', 'Pronto para Retirada', 'Finalizado'];
+
+        const statusCores = {
+            'Em Diagnóstico': 'border-amber-500',
+            'Aguardando Peças': 'border-rose-500',
+            'Em Execução': 'border-indigo-500',
+            'Pronto para Retirada': 'border-sky-500',
+            'Finalizado': 'border-emerald-500'
+        };
 
         async function carregarKanban() {
             const container = document.getElementById('kanbanContainer');
             if(!container) return;
             container.innerHTML = '';
 
-            const { data: ordens } = await _supabase.from('ordens_servico').select('*, veiculos(modelo, placa)');
+            // Ordena do mais recente para o mais antigo (created_at DESC)
+            const { data: ordens } = await _supabase
+                .from('ordens_servico')
+                .select('*, veiculos(modelo, placa)')
+                .order('created_at', { ascending: false });
 
             statusKanbanList.forEach(status => {
                 const col = document.createElement('div');
                 col.className = 'flex-1 min-w-[260px] bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col gap-3';
-                col.innerHTML = `<h3 class="font-bold text-xs uppercase text-indigo-400 tracking-wider border-b border-slate-800 pb-2">${status}</h3>`;
+                col.innerHTML = `<h3 class="font-bold text-xs uppercase text-indigo-400 tracking-wider border-b border-slate-800 pb-2 flex justify-between items-center">${status} <span id="count-${status.replace(/\s+/g, '')}" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono">0</span></h3>`;
 
                 const ordensFiltradas = ordens ? ordens.filter(o => (o.status || 'Em Diagnóstico') === status) : [];
 
@@ -626,10 +641,17 @@
                     listDiv.innerHTML = `<p class="text-[11px] text-slate-500 italic">Nenhuma OS</p>`;
                 } else {
                     ordensFiltradas.forEach(os => {
+                        const corBorda = statusCores[os.status || 'Em Diagnóstico'] || 'border-indigo-500';
                         const card = document.createElement('div');
-                        card.className = 'bg-slate-800 p-3 rounded-lg border-l-4 border-indigo-500 shadow space-y-2 text-xs';
+                        card.className = `kanban-card bg-slate-800 p-3 rounded-lg border-l-4 ${corBorda} shadow space-y-2 text-xs transition-all`;
                         
-                        let selectHtml = `<select onchange="atualizarStatusOS(${os.id}, this.value)" class="w-full bg-slate-900 text-white text-[11px] p-1.5 rounded border border-slate-700 outline-none">`;
+                        const modeloVeic = os.veiculos ? os.veiculos.modelo : 'Veículo';
+                        const placaVeic = os.veiculos ? mascaraPlacaFormatada(os.veiculos.placa) : 'N/A';
+                        
+                        card.setAttribute('data-placa', placaVeic.toUpperCase().replace('-', ''));
+                        card.setAttribute('data-modelo', modeloVeic.toUpperCase());
+
+                        let selectHtml = `<select onchange="atualizarStatusOS(${os.id}, this.value)" class="w-full bg-slate-900 text-white text-[11px] p-1.5 rounded border border-slate-700 outline-none focus:border-indigo-500">`;
                         statusKanbanList.forEach(s => {
                             selectHtml += `<option value="${s}" ${(os.status || 'Em Diagnóstico') === s ? 'selected' : ''}>${s}</option>`;
                         });
@@ -637,8 +659,8 @@
 
                         card.innerHTML = `
                             <div class="flex justify-between items-start">
-                                <span class="font-bold text-white">#${os.id} - ${os.veiculos ? os.veiculos.modelo : 'Veículo'}</span>
-                                <span class="font-mono text-[10px] text-indigo-300 bg-indigo-950 px-1.5 py-0.5 rounded border border-indigo-800">${os.veiculos ? mascaraPlacaFormatada(os.veiculos.placa) : 'N/A'}</span>
+                                <span class="font-bold text-white">#${os.id} - ${modeloVeic}</span>
+                                <span class="font-mono text-[10px] text-indigo-300 bg-indigo-950 px-1.5 py-0.5 rounded border border-indigo-800">${placaVeic}</span>
                             </div>
                             ${os.observacoes ? `<p class="text-[11px] text-slate-400 line-clamp-2">${os.observacoes}</p>` : ''}
                             ${selectHtml}
@@ -649,12 +671,35 @@
 
                 col.appendChild(listDiv);
                 container.appendChild(col);
+
+                // Atualizar contador da coluna
+                const countSpan = document.getElementById(`count-${status.replace(/\s+/g, '')}`);
+                if(countSpan) countSpan.innerText = ordensFiltradas.length;
             });
+
+            // Aplicar o filtro se houver algo digitado
+            filtrarCardsKanban();
         }
 
         async function atualizarStatusOS(osId, novoStatus) {
             await _supabase.from('ordens_servico').update({ status: novoStatus }).eq('id', osId);
             carregarKanban();
+        }
+
+        function filtrarCardsKanban() {
+            const termo = document.getElementById('filtroKanbanPlaca').value.toUpperCase().replace('-', '').trim();
+            const cards = document.querySelectorAll('.kanban-card');
+
+            cards.forEach(card => {
+                const placa = card.getAttribute('data-placa') || '';
+                const modelo = card.getAttribute('data-modelo') || '';
+
+                if (placa.includes(termo) || modelo.includes(termo)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
         }
 
         function mascaraPlacaFormatada(v) {
@@ -859,7 +904,7 @@
                 cliente_id: clienteId,
                 valor_total: totalGeral,
                 valor_final: totalGeral,
-                chave_pix: chavePix,
+                chave_pix: chavePix || null,
                 token_aprovacao: token,
                 status_financeiro: 'Pendente',
                 status_aprovacao: 'Pendente'
